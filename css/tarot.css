@@ -1,0 +1,36 @@
+/* My Little Bubble — tarot */
+/* ---------- tarot ---------- */
+body[data-route="tarot"] main{--ink:#F6EEFF;--ink-soft:#CDBDF2;--ink-faint:#8D7CC0;color:var(--ink)}
+body[data-route="tarot"] .page-head h1{font-family:var(--magic);font-weight:700;letter-spacing:.02em;background:linear-gradient(180deg,#FFF3C4,#E8C872 60%,#B8893A);-webkit-background-clip:text;background-clip:text;color:transparent}
+.moon-row{display:flex;gap:18px;justify-content:center;color:#E8C872;font-size:14px;margin:-8px 0 26px;opacity:.9}
+.moon-row span{display:inline-block;width:18px;height:18px;border-radius:50%;box-shadow:inset -6px 0 0 0 #E8C872}
+.moon-row span:nth-child(2){box-shadow:inset -10px 0 0 0 #E8C872}
+.moon-row span:nth-child(3){background:#E8C872;box-shadow:0 0 16px #E8C872}
+.moon-row span:nth-child(4){box-shadow:inset 10px 0 0 0 #E8C872}
+.moon-row span:nth-child(5){box-shadow:inset 6px 0 0 0 #E8C872}
+.tarot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:30px 22px}
+.tcard{perspective:1200px;aspect-ratio:7/12;cursor:pointer}
+.tcard-in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.3,1.3,.4,1)}
+.tcard.flip .tcard-in{transform:rotateY(180deg)}
+.tcard:hover .tcard-in{box-shadow:0 0 40px -6px rgba(232,200,114,.5)}
+.tface{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;border:2px solid #E8C872;box-shadow:inset 0 0 0 5px #1A1236,inset 0 0 0 6px rgba(232,200,114,.6),0 20px 40px -18px rgba(0,0,0,.7)}
+.tfront{background:radial-gradient(circle at 50% 35%,#6A4BC7,#2A1A5E 70%);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:14px}
+.tfront img{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);object-fit:cover;border-radius:10px}
+.tfront .sigil{position:absolute;inset:0;display:grid;place-items:center;color:#E8C872}
+.tfront .sigil svg{width:62%;opacity:.9;animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tfront .tname{position:relative;z-index:2;width:100%;text-align:center;padding:8px 6px;border-radius:10px;background:rgba(20,12,50,.72);border:1px solid rgba(232,200,114,.55);color:#FFF3C4;font-family:var(--display);font-weight:600;font-size:15px;line-height:1.3}
+.tcorner{position:absolute;color:#E8C872;font-size:12px;z-index:3}
+.tback{transform:rotateY(180deg);background:linear-gradient(180deg,#24174F,#150E33);padding:20px 16px 14px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:#EDE3FF}
+.tback h3{font-family:var(--display);color:#FFE9A8;font-size:17px;margin-bottom:4px}
+.tback dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 10px}
+.tback dt{color:#B7A4E8}
+.tback dd{margin:0;text-align:right}
+.tback .tnote{flex:1;overflow:auto;color:#D8CCF7;font-size:13px;border-top:1px dashed rgba(232,200,114,.4);padding-top:6px;margin-top:4px;white-space:pre-line}
+.tback .tact{display:flex;gap:6px;justify-content:center}
+.tback .tact button{padding:5px 12px;border-radius:999px;border:1px solid rgba(232,200,114,.6);color:#FFE9A8;font-size:13px}
+.tback .tact button:hover{background:rgba(232,200,114,.15)}
+body[data-route="tarot"] .btn{background:linear-gradient(135deg,#E8C872,#B08AFF);color:#1A1236}
+body[data-route="tarot"] .empty .em-orb{background:rgba(232,200,114,.15)}
+body[data-route="tarot"] .empty .em-orb svg{color:#E8C872}
+.tarot-count{font-family:var(--magic);color:#E8C872}

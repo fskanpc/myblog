@@ -1,0 +1,29 @@
+/* My Little Bubble — planner */
+/* ---------- planner ---------- */
+.planner{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:start}
+@media (max-width:1000px){.planner{grid-template-columns:1fr}}
+.cal{padding:22px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-head h2{font-size:24px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-grid .dow{text-align:center;font-size:12.5px;font-weight:600;color:var(--ink-faint);padding-bottom:4px}
+.day{aspect-ratio:1/1;border-radius:16px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;font-weight:500;transition:background .2s,transform .2s;min-height:44px}
+.day:hover{background:var(--glass-hi)}
+.day.other{opacity:.35}
+.day.today .n{background:var(--pink);color:#fff}
+.day.sel{background:var(--glass-strong);box-shadow:var(--shadow-sm)}
+.day .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:14.5px}
+.dots{display:flex;gap:3px}
+.dots i{width:6px;height:6px;border-radius:50%}
+.daypanel{padding:22px}
+.daypanel h2{font-size:22px}
+.daypanel .sub{color:var(--ink-soft);margin:0 0 14px;font-size:14px}
+.tasks{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:8px}
+.task{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:16px;background:var(--glass-strong);border-left:5px solid var(--tc)}
+.task .tt{font-size:15px;line-height:1.4}
+.task .tm{font-size:12.5px;color:var(--ink-soft)}
+.task.done .tt{text-decoration:line-through;opacity:.55}
+.addtask{display:grid;gap:8px;padding:14px;border-radius:18px;background:var(--glass)}
+.addtask .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.addtask input[type=text]{flex:1;min-width:0}
+.addtask input{padding:9px 12px;border-radius:12px;border:1px solid var(--field-border);background:var(--field);outline:none}
