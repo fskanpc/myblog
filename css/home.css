@@ -108,7 +108,7 @@
 /* ================= live meadow hero ================= */
 body[data-route="home"] main{max-width:none;padding:0}
 body[data-route="home"] .topbar{position:fixed;left:0;right:0;margin:0 auto;top:calc(14px + env(safe-area-inset-top,0px))}
-.meadow{position:relative;height:100vh;height:100svh;min-height:520px;overflow:hidden;isolation:isolate;background:rgb(154,196,217)}
+.meadow{position:relative;height:100vh;height:100svh;min-height:520px;overflow:hidden;isolation:isolate;background:rgb(148,232,234)}
 .md-stage{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%)}
 .md-sky{position:absolute;left:0;top:0;width:100%;height:63.575%;overflow:hidden;background:rgb(154,196,217)}
 .md-strip{position:absolute;left:0;top:0;height:100%;display:flex;width:max-content;animation:mdDrift 260s linear infinite;will-change:transform}
@@ -125,20 +125,20 @@ body[data-route="home"] .topbar{position:fixed;left:0;right:0;margin:0 auto;top:
 .md-flash{position:absolute;inset:0;pointer-events:none;background:#fff;opacity:0}
 .md-flash.bolt{animation:bolt 1.1s ease-out}
 @keyframes bolt{0%,100%{opacity:0}6%{opacity:.75}12%{opacity:.1}18%{opacity:.55}40%{opacity:0}}
-.md-sky,.md-hill{transition:filter 1.2s}
-.meadow[data-wx="cloudy"] .md-sky{filter:saturate(.75) brightness(.95)}
+.md-land,.md-clouds{transition:filter 1.2s}
+.meadow[data-wx="cloudy"] .md-land{filter:saturate(.8) brightness(.96)}
 .meadow[data-wx="fog"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(235,240,245,.2),rgba(235,240,245,.55))}
-.meadow[data-wx="rain"] .md-sky,.meadow[data-wx="storm"] .md-sky{filter:grayscale(.55) brightness(.78) contrast(1.05)}
-.meadow[data-wx="rain"] .md-hill,.meadow[data-wx="storm"] .md-hill{filter:saturate(.8) brightness(.78)}
+.meadow[data-wx="rain"] .md-clouds,.meadow[data-wx="storm"] .md-clouds{filter:brightness(.72)}
+.meadow[data-wx="rain"] .md-land,.meadow[data-wx="storm"] .md-land{filter:saturate(.7) brightness(.78)}
 .meadow[data-wx="rain"] .md-tint,.meadow[data-wx="storm"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(40,55,80,.35),rgba(30,45,60,.25))}
-.meadow[data-day="0"] .md-sky{filter:brightness(.38) saturate(.7) hue-rotate(12deg)}
-.meadow[data-day="0"] .md-hill{filter:brightness(.4) saturate(.7)}
+.meadow[data-day="0"] .md-clouds{filter:brightness(.45)}
+.meadow[data-day="0"] .md-land{filter:brightness(.38) saturate(.8) hue-rotate(10deg)}
 .meadow[data-day="0"] .md-stars{opacity:1}
 .meadow[data-day="0"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(18,24,70,.45),rgba(10,20,40,.25))}
 .meadow[data-day="0"][data-wx="rain"] .md-stars,.meadow[data-day="0"][data-wx="storm"] .md-stars{opacity:0}
 
 /* greeting bar, sits where the photo had its bar */
-.md-greet{position:absolute;left:52.1%;top:49.9%;transform:translate(-50%,-50%);width:min(41.6%,calc(100vw - 32px));height:clamp(50px,11%,66px);display:flex;align-items:center;gap:10px;padding:0 8px 0 14px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.18));-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 30px -12px rgba(20,40,70,.45),inset 0 1px 0 rgba(255,255,255,.7);color:#fff;z-index:3;animation:greetIn 1s cubic-bezier(.2,1.2,.4,1) .3s backwards}
+.md-greet{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);width:min(44%,calc(100vw - 32px));height:clamp(50px,9%,66px);display:flex;align-items:center;gap:10px;padding:0 8px 0 14px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.18));-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 30px -12px rgba(20,40,70,.45),inset 0 1px 0 rgba(255,255,255,.7);color:#fff;z-index:3;animation:greetIn 1s cubic-bezier(.2,1.2,.4,1) .3s backwards}
 @keyframes greetIn{from{opacity:0;transform:translate(-50%,-30%) scale(.95)}}
 .mg-ic{font-size:20px;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2))}
 .mg-line{flex:1;min-width:0;display:flex;align-items:center;overflow:hidden;white-space:nowrap}
@@ -157,11 +157,23 @@ body[data-route="home"] .topbar{position:fixed;left:0;right:0;margin:0 auto;top:
 @media (max-width:860px){.md-greet{left:50%}.md-scroll{display:none}.md-weather{left:50%;transform:translateX(-50%);white-space:nowrap}}
 
 /* lawn with the folders, continuing the photo's grass */
-.lawn{position:relative;padding:34px max(20px,calc((100% - 1180px) / 2)) 70px;background:repeating-linear-gradient(98deg,rgba(255,255,255,.05) 0 2px,transparent 2px 7px),repeating-linear-gradient(82deg,rgba(0,40,0,.07) 0 2px,transparent 2px 9px),linear-gradient(180deg,#618443,#4A7534 40%,#3B632B)}
-.lawn::before{content:"";position:absolute;left:0;right:0;top:-80px;height:80px;background:linear-gradient(180deg,rgba(97,132,67,0),#618443);pointer-events:none}
+.lawn{position:relative;padding:34px max(20px,calc((100% - 1180px) / 2)) 70px;background:linear-gradient(180deg,#56BB5D,#4AAA52 45%,#3C9446)}
+.lawn::before{content:"";position:absolute;left:0;right:0;top:-80px;height:80px;background:linear-gradient(180deg,rgba(86,187,93,0),#56BB5D);pointer-events:none}
 .lawn .fold-title{position:relative}
 .fold-name{position:absolute;left:0;right:0;bottom:-26px;text-align:center;color:#fff;font-size:14px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.35);white-space:nowrap}
 .lawn .folds{row-gap:52px}
 .lawn .folds{grid-template-columns:repeat(5,1fr);gap:52px 22px}
 @media (max-width:1100px){.lawn .folds{grid-template-columns:repeat(4,1fr)}}
 @media (max-width:860px){.lawn .folds{grid-template-columns:repeat(2,1fr);gap:46px 16px}}
+
+/* illustrated landscape layers */
+.md-land{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;pointer-events:none}
+.md-clouds{position:absolute;inset:0;pointer-events:none;z-index:1}
+.lc{position:absolute;left:100%;animation:lcDrift linear infinite;will-change:left}
+.lc svg{display:block;width:100%;height:100%;filter:drop-shadow(0 6px 10px rgba(40,120,130,.12))}
+@keyframes lcDrift{from{left:100%}to{left:calc(var(--w) * -1)}}
+.meadow[data-wx="cloudy"] .lc,.meadow[data-wx="fog"] .lc{animation-play-state:running;filter:brightness(.97)}
+.meadow[data-wx="rain"] .lc,.meadow[data-wx="storm"] .lc{animation-duration:70s !important}
+.md-stars{height:40%;z-index:0}
+.art-credit{position:relative;margin:48px 0 0;text-align:center;font-size:12px;color:rgba(255,255,255,.75)}
+.art-credit a{color:#fff}

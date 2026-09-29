@@ -37,7 +37,20 @@ const FOLDER_PAT = (() => {
 const FOLDER_TAB = Object.fromEntries(Object.entries(FOLDER_THEME).map(([k, v]) => [k, v.tab]));
 const FOLDER_ICON = Object.fromEntries(Object.entries(FOLDER_THEME).map(([k, v]) => [k, v.icon || v.ink]));
 /* photo layers: sky strip (moves) + hill cut-out (still). Source photo 2940x1628 after 4x upscale */
-const MEADOW = {ar:2940 / 1628, skyH:63.575, tile:.7, fill:'rgb(154,196,217)'};
+const LAND_CLOUDS = [{"d": "M 469.17 125.03 L 193.15 125.03 C 201.04 125.03 208.24 119.85 216.06 120.85 C 223.88 121.85 231.95 123.32 239.54 121.17 C 244.30 119.82 248.56 117.11 253.19 115.35 C 257.82 113.58 263.28 112.85 267.53 115.39 C 265.53 111.91 266.89 106.69 268.73 103.14 C 270.58 99.58 274.54 97.15 278.55 97.38 C 282.55 97.61 286.30 100.63 287.16 104.55 C 286.15 99.57 285.05 92.78 286.79 88.01 C 288.74 82.64 294.28 78.80 300 78.86 C 305.71 78.92 311.17 82.87 313.01 88.28 C 317.11 86.03 322.81 85.98 327.08 87.88 C 331.34 89.78 334.63 93.75 335.70 98.29 C 340.43 96.30 345.91 96.38 350.50 98.67 C 355.09 100.96 358.60 105.32 359.85 110.30 C 364.91 106.69 372.32 104.30 378.48 105.06 C 384.65 105.83 390.48 108.98 394.50 113.71 C 399.90 110.59 408.03 112.66 414.00 114.47 C 419.97 116.28 425.65 119.12 431.81 120.15 C 437.96 121.17 444.25 120.32 450.49 120.29 C 456.73 120.26 464.36 121.05 469.17 125.03 ", "x": 193.15, "y": 78.8, "w": 276.02, "h": 46.230000000000004}, {"d": "M 877.73 87.53 L 601.72 87.53 C 609.60 87.53 616.80 82.35 624.62 83.35 C 632.44 84.36 640.51 85.82 648.10 83.67 C 652.87 82.32 657.13 79.61 661.75 77.85 C 666.38 76.08 671.85 75.35 676.10 77.89 C 674.10 74.42 675.45 69.20 677.30 65.64 C 679.14 62.08 683.10 59.66 687.11 59.88 C 691.11 60.11 694.87 63.13 695.72 67.05 C 694.71 62.07 693.62 55.29 695.35 50.51 C 697.30 45.15 702.85 41.30 708.56 41.36 C 714.27 41.42 719.74 45.38 721.58 50.78 C 725.67 48.53 731.37 48.49 735.64 50.38 C 739.91 52.28 743.19 56.25 744.26 60.80 C 749 58.80 754.47 58.88 759.06 61.17 C 763.66 63.46 767.16 67.82 768.42 72.80 C 773.48 69.20 780.89 66.80 787.05 67.57 C 793.21 68.33 799.04 71.48 803.06 76.21 C 808.46 73.09 816.59 75.16 822.56 76.97 C 828.53 78.78 834.22 81.62 840.37 82.65 C 846.52 83.67 852.82 82.83 859.05 82.80 C 865.29 82.76 872.93 83.55 877.73 87.53 ", "x": 601.72, "y": 41.3, "w": 276.01, "h": 46.230000000000004}, {"d": "M 127.96 50.44 L -81.12 50.44 C -75.14 50.44 -69.69 46.51 -63.76 47.27 C -57.84 48.03 -51.73 49.14 -45.98 47.51 C -42.37 46.49 -39.14 44.44 -35.64 43.10 C -32.13 41.76 -27.99 41.21 -24.77 43.13 C -26.28 40.50 -25.26 36.55 -23.87 33.85 C -22.47 31.16 -19.46 29.32 -16.43 29.49 C -13.40 29.67 -10.55 31.95 -9.91 34.92 C -10.67 31.15 -11.50 26.01 -10.19 22.40 C -8.71 18.33 -4.51 15.42 -0.18 15.46 C 4.14 15.51 8.28 18.50 9.67 22.60 C 12.77 20.89 17.09 20.86 20.32 22.30 C 23.55 23.73 26.05 26.74 26.85 30.18 C 30.44 28.67 34.58 28.73 38.07 30.47 C 41.54 32.20 44.20 35.50 45.15 39.27 C 48.98 36.55 54.60 34.73 59.26 35.31 C 63.93 35.89 68.35 38.28 71.39 41.86 C 75.49 39.50 81.64 41.06 86.17 42.43 C 90.69 43.81 95 45.96 99.66 46.74 C 104.32 47.51 109.08 46.87 113.81 46.85 C 118.53 46.82 124.32 47.42 127.96 50.44 ", "x": -81.12, "y": 15.42, "w": 209.07999999999998, "h": 35.019999999999996}];
+const MEADOW = {ar:750 / 500};
+/* floating clouds: the three from the artwork plus a few smaller copies, each drifting right to left in a loop */
+function landClouds(){
+  const extra = [[0, 540, 150, .55], [2, 300, 30, .6], [1, 60, 95, .5], [0, 700, 10, .45]];
+  const list = LAND_CLOUDS.map((c, i) => ({c, x:c.x, y:c.y, s:1, dur:[150, 130, 170][i]}))
+    .concat(extra.map(([i, x, y, s], k) => ({c:LAND_CLOUDS[i], x, y, s, dur:190 + k * 25})));
+  return list.map(({c, x, y, s, dur}) => {
+    const w = c.w * s / 750 * 100, hh = c.h * s / 500 * 100, top = y / 500 * 100;
+    const startLeft = x / 750 * 100, span = 100 + w;
+    const delay = -dur * (100 - startLeft) / span;
+    return `<div class="lc" style="--w:${w.toFixed(2)}%;width:${w.toFixed(2)}%;height:${hh.toFixed(2)}%;top:${top.toFixed(2)}%;animation-duration:${dur}s;animation-delay:${delay.toFixed(1)}s"><svg viewBox="${c.x} ${c.y} ${c.w} ${c.h}" preserveAspectRatio="none"><path fill="#fff" d="${c.d}"/></svg></div>`;
+  }).join('');
+}
 let homeWeatherMode = null;
 function weatherMode(){ return homeWeatherMode || META.weatherMode || 'auto'; }
 
@@ -55,13 +68,9 @@ VIEWS.home = async el => {
 
   const hero = h(`<section class="meadow" aria-label="${T('หน้าแรก')}">
     <div class="md-stage">
-      <div class="md-sky"><div class="md-strip">
-        <img src="img/sky-2000.webp" srcset="img/sky-1000.webp 1000w, img/sky-2000.webp 2058w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
-        <img src="img/sky-2000.webp" srcset="img/sky-1000.webp 1000w, img/sky-2000.webp 2058w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
-        <img src="img/sky-2000.webp" srcset="img/sky-1000.webp 1000w, img/sky-2000.webp 2058w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
-      </div></div>
+      <img class="md-land" src="img/landscape.svg" alt="" draggable="false">
       <div class="md-stars"></div>
-      <img class="md-hill" src="img/hill-2940.webp" srcset="img/hill-1600.webp 1600w, img/hill-2940.webp 2940w" sizes="(max-width:860px) 230vw, 100vw" alt="" draggable="false" fetchpriority="high">
+      <div class="md-clouds">${landClouds()}</div>
       <div class="md-greet" role="status" aria-live="polite">
         <span class="mg-ic" aria-hidden="true">☁️</span>
         <span class="mg-line"><span class="mg-text"></span><span class="mg-caret"></span></span>
@@ -77,6 +86,7 @@ VIEWS.home = async el => {
   const lawn = h(`<section class="lawn" id="folders">
     <h2 class="fold-title">แฟ้มของฉัน</h2>
     <nav class="folds" aria-label="แฟ้มทั้งหมด"></nav>
+    <p class="art-credit">ภาพพื้นหลัง: <a href="https://www.freepik.com" target="_blank" rel="noopener">Freepik</a></p>
   </section>`);
 
   const folds = $('.folds', lawn);
