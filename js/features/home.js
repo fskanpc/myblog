@@ -56,12 +56,12 @@ VIEWS.home = async el => {
   const hero = h(`<section class="meadow" aria-label="${T('หน้าแรก')}">
     <div class="md-stage">
       <div class="md-sky"><div class="md-strip">
-        <img src="img/sky-1600.webp" srcset="img/sky-800.webp 823w, img/sky-1600.webp 1543w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
-        <img src="img/sky-1600.webp" srcset="img/sky-800.webp 823w, img/sky-1600.webp 1543w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
-        <img src="img/sky-1600.webp" srcset="img/sky-800.webp 823w, img/sky-1600.webp 1543w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
+        <img src="img/sky-2000.webp" srcset="img/sky-1000.webp 1000w, img/sky-2000.webp 2058w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
+        <img src="img/sky-2000.webp" srcset="img/sky-1000.webp 1000w, img/sky-2000.webp 2058w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
+        <img src="img/sky-2000.webp" srcset="img/sky-1000.webp 1000w, img/sky-2000.webp 2058w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
       </div></div>
       <div class="md-stars"></div>
-      <img class="md-hill" src="img/hill-2400.webp" srcset="img/hill-1280.webp 1280w, img/hill-2400.webp 2400w" sizes="(max-width:860px) 230vw, 100vw" alt="" draggable="false" fetchpriority="high">
+      <img class="md-hill" src="img/hill-2940.webp" srcset="img/hill-1600.webp 1600w, img/hill-2940.webp 2940w" sizes="(max-width:860px) 230vw, 100vw" alt="" draggable="false" fetchpriority="high">
       <div class="md-greet" role="status" aria-live="polite">
         <span class="mg-ic" aria-hidden="true">☁️</span>
         <span class="mg-line"><span class="mg-text"></span><span class="mg-caret"></span></span>
