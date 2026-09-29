@@ -1,0 +1,6 @@
+/* My Little Bubble — motion */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .hero h1.pop-in{opacity:0;transform:translateY(30px) scale(.94);animation:pop .9s .15s cubic-bezier(.2,1.5,.4,1) forwards}
+.hero .word,.hero h1.pop-in,.hf-front .word{opacity:1;transform:none}
+}

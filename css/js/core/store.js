@@ -1,0 +1,54 @@
+/* =========================================================
+   storage: Supabase (Postgres + Row Level Security)
+   ========================================================= */
+const SECTIONS = ['diary','books','tarot','travel','screen','music','vocab','planner'];
+const Store = {
+  mode:'supabase', uid:null, email:'', sb:null, cache:{},
+  init(){
+    const cfg = window.BUBBLE_CONFIG || {};
+    const ok = window.supabase && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && !/YOUR_/.test(cfg.SUPABASE_URL + cfg.SUPABASE_ANON_KEY);
+    if(!ok){ this.mode = 'unconfigured'; return; }
+    this.sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true}});
+  },
+  async session(){
+    const {data} = await this.sb.auth.getSession();
+    this.setUser(data.session && data.session.user);
+    return data.session && data.session.user;
+  },
+  setUser(u){ this.uid = u ? u.id : null; this.email = u ? (u.email || '') : ''; this.user = u || null; },
+  reset(){ this.cache = {}; },
+  newId(){ return (crypto.randomUUID ? crypto.randomUUID() : 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10)); },
+  async list(section){
+    if(this.cache[section]) return this.cache[section];
+    const {data, error} = await this.sb.from('items').select('id,data').eq('section', section);
+    if(error){ console.error(error); toast('โหลดข้อมูลไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง'); return (this.cache[section] = []); }
+    return (this.cache[section] = data.map(r => ({...r.data, id:r.id})));
+  },
+  async save(section, item){
+    const items = await this.list(section);
+    if(!item.id){ item.id = this.newId(); item.createdAt = Date.now(); }
+    item.updatedAt = Date.now();
+    const {id, ...data} = item;
+    const {error} = await this.sb.from('items').upsert({user_id:this.uid, id, section, data}, {onConflict:'user_id,id'});
+    if(error) throw new Error(error.message);
+    const i = items.findIndex(x => x.id === item.id);
+    if(i >= 0) items[i] = item; else items.push(item);
+    return item;
+  },
+  async remove(section, id){
+    const {error} = await this.sb.from('items').delete().eq('id', id);
+    if(error) throw new Error(error.message);
+    const items = await this.list(section);
+    const i = items.findIndex(x => x.id === id);
+    if(i >= 0) items.splice(i, 1);
+  },
+  async getMeta(){
+    const {data, error} = await this.sb.from('profiles').select('meta').eq('user_id', this.uid).maybeSingle();
+    if(error){ console.error(error); return {}; }
+    return (data && data.meta) || {};
+  },
+  async setMeta(meta){
+    const {error} = await this.sb.from('profiles').upsert({user_id:this.uid, meta}, {onConflict:'user_id'});
+    if(error) throw new Error(error.message);
+  }
+};
