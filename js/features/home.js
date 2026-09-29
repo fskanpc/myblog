@@ -44,6 +44,63 @@ const FOLDER_PAT = (() => {
 })();
 const FOLDER_TAB = Object.fromEntries(Object.entries(FOLDER_THEME).map(([k, v]) => [k, v.tab]));
 const FOLDER_ICON = Object.fromEntries(Object.entries(FOLDER_THEME).map(([k, v]) => [k, v.icon || v.ink]));
+/* ---- meadow background: fluffy clouds + grassy hill with little flowers (drawn, no photos) ---- */
+function seeded(seed){ let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+const MEADOW_SVG = (() => {
+  const R = seeded(20260929), W = 1200, H = 1400;
+  const hill = x => 250 - 190 * Math.exp(-Math.pow((x - 600) / 300, 2)) - 18 * Math.sin(x / 120) + 10 * Math.sin(x / 47);
+  const back = x => 175 - 40 * Math.sin(x / 260 + 1.2) - 25 * Math.cos(x / 170);
+  const path = (f, step = 12) => { let d = `M0 ${f(0).toFixed(1)}`; for(let x = step; x <= W; x += step) d += ` L${x} ${f(x).toFixed(1)}`; return d + ` L${W} ${H} L0 ${H} Z`; };
+  const greens = ['#4E9E38','#5DAF44','#6BBE4E','#3F8A2E','#7ACB58','#88D466','#347A28'];
+  const fringe = (f, n, lenMin, lenMax, cols) => { let s = ''; for(let i = 0; i < n; i++){ const x = (i / n) * W + R() * 4; const y = f(x) + 3 + R() * 5; const l = lenMin + R() * (lenMax - lenMin); const lean = (R() - .5) * 10; s += `<path d="M${x.toFixed(1)} ${y.toFixed(1)} q${(lean / 2).toFixed(1)} ${(-l / 2).toFixed(1)} ${lean.toFixed(1)} ${(-l).toFixed(1)}" stroke="${cols[(R() * cols.length) | 0]}" stroke-width="${(1.4 + R() * 1.4).toFixed(1)}"/>`; } return s; };
+  // blades scattered across the hill body, shorter near the top (distance)
+  let body = '';
+  for(let i = 0; i < 1400; i++){
+    const x = R() * W, top = hill(x); const y = top + 10 + Math.pow(R(), .7) * (H - top - 10);
+    const depth = Math.min(1, (y - top) / 700); const l = 5 + depth * 22 + R() * 6; const lean = (R() - .5) * (6 + depth * 10);
+    body += `<path d="M${x.toFixed(1)} ${y.toFixed(1)} q${(lean / 2).toFixed(1)} ${(-l / 2).toFixed(1)} ${lean.toFixed(1)} ${(-l).toFixed(1)}" stroke="${greens[(R() * greens.length) | 0]}" stroke-width="${(1 + depth * 2).toFixed(1)}" opacity="${(.55 + R() * .45).toFixed(2)}"/>`;
+  }
+  // little white flowers
+  let flowers = '';
+  for(let i = 0; i < 120; i++){
+    const x = 30 + R() * (W - 60), top = hill(x); const y = top + 14 + Math.pow(R(), 1.3) * 520;
+    const s = .5 + Math.min(1.4, (y - top) / 300);
+    flowers += `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${s.toFixed(2)})"><circle cx="0" cy="-2.2" r="2"/><circle cx="2.1" cy="-.6" r="2"/><circle cx="1.3" cy="1.9" r="2"/><circle cx="-1.3" cy="1.9" r="2"/><circle cx="-2.1" cy="-.6" r="2"/><circle r="1.1" fill="#F6D65A"/></g>`;
+  }
+  // red wildflower clusters on both sides
+  let reds = '';
+  const cluster = (cx, spread, n) => { for(let i = 0; i < n; i++){ const x = cx + (R() - .5) * spread, top = hill(x), y = top - 4 + R() * 30; const h = 10 + R() * 16; const c = ['#E0503A','#D8452F','#EF7A4A','#C93A2A'][(R() * 4) | 0]; reds += `<path d="M${x.toFixed(1)} ${(y + h).toFixed(1)} l${((R() - .5) * 3).toFixed(1)} ${-h.toFixed(1)}" stroke="#4E8F34" stroke-width="1.2"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(2 + R() * 1.8).toFixed(1)}" fill="${c}"/>`; } };
+  cluster(120, 200, 55); cluster(300, 120, 25); cluster(930, 140, 30); cluster(1090, 180, 50);
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMin slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="mdBack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9D98A"/><stop offset=".4" stop-color="#7FC05E"/></linearGradient>
+      <linearGradient id="mdHill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8AD063"/><stop offset=".25" stop-color="#63B045"/><stop offset=".7" stop-color="#4A9A36"/><stop offset="1" stop-color="#3C8A2E"/></linearGradient>
+      <radialGradient id="mdLight" cx=".5" cy=".05" r=".6"><stop offset="0" stop-color="#EFFFD0" stop-opacity=".45"/><stop offset="1" stop-color="#EFFFD0" stop-opacity="0"/></radialGradient>
+    </defs>
+    <path d="${path(back)}" fill="url(#mdBack)"/>
+    <g fill="none" stroke-linecap="round">${fringe(back, 260, 5, 11, ['#8CCB6A','#9ED67C','#7DBD5C'])}</g>
+    <path d="${path(hill)}" fill="url(#mdHill)"/>
+    <path d="${path(hill)}" fill="url(#mdLight)"/>
+    <g fill="none" stroke-linecap="round">${body}</g>
+    <g fill="none" stroke-linecap="round">${fringe(hill, 420, 8, 22, greens)}</g>
+    <g>${reds}</g>
+    <g fill="#FFFFFF">${flowers}</g>
+  </svg>`;
+})();
+function meadowClouds(){
+  const R = seeded(77);
+  const spec = [[1, 5, 230], [24, 2, 170], [70, 4, 250], [88, 16, 180], [8, 26, 150], [80, 30, 140]];
+  return spec.map(([x, y, w], i) => {
+    let puffs = '';
+    const n = 14;
+    for(let k = 0; k < n; k++){
+      const t = k / (n - 1), px = 6 + t * 88 + (R() - .5) * 6, arch = Math.sin(t * Math.PI);
+      const size = 18 + arch * 26 + R() * 10, py = 62 - arch * 26 + (R() - .5) * 8;
+      puffs += `<i style="left:${px.toFixed(1)}%;top:${py.toFixed(1)}%;width:${size.toFixed(1)}%;"></i>`;
+    }
+    return `<div class="sticker md-cloud-wrap" data-depth="${(.6 + (i % 3) * .5).toFixed(1)}" style="left:${x}%;top:${y}%"><div class="md-cloud" style="--cw:${w}px;--cd:${60 + i * 9}s">${puffs}</div></div>`;
+  }).join('');
+}
 VIEWS.home = async el => {
   const now = new Date(), hr = now.getHours();
   const hello = hr < 5 ? 'ดึกแล้วนะ' : hr < 12 ? 'อรุณสวัสดิ์' : hr < 17 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น';
@@ -73,8 +130,8 @@ VIEWS.home = async el => {
   };
 
   const scene = h(`<section class="home-scene" style="--blades:${BLADES}">
-    <div class="hs-sky" aria-hidden="true"></div>
-    <div class="hs-grass" aria-hidden="true"><span class="bush" style="left:-20px"><i style="left:30px;top:18px"></i><i style="left:62px;top:10px"></i></span><span class="bush" style="right:-26px;transform:scale(1.2)"><i style="left:44px;top:14px"></i><i style="left:76px;top:24px"></i><i style="left:24px;top:30px"></i></span></div>
+    <div class="hs-sky" aria-hidden="true">${meadowClouds()}</div>
+    <div class="hs-hill" aria-hidden="true">${MEADOW_SVG}</div>
     <div class="hero-fold-wrap">
       <div class="hf">
         <div class="hf-back"></div>
