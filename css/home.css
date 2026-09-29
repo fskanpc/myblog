@@ -104,3 +104,64 @@
 :root[data-theme="dark"] .hs-hill svg{filter:brightness(.62) saturate(.85)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hs-hill svg{filter:brightness(.62) saturate(.85)}}
 @media (max-width:640px){.hs-hill{top:calc(var(--gy) - 150px)}.md-cloud{width:calc(var(--cw) * .55);height:calc(var(--cw) * .23)}}
+
+/* ================= live meadow hero ================= */
+body[data-route="home"] main{max-width:none;padding:0}
+body[data-route="home"] .topbar{position:fixed;left:0;right:0;margin:0 auto;top:calc(14px + env(safe-area-inset-top,0px))}
+.meadow{position:relative;height:100vh;height:100svh;min-height:520px;overflow:hidden;isolation:isolate;background:rgb(154,196,217)}
+.md-stage{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%)}
+.md-sky{position:absolute;left:0;top:0;width:100%;height:63.575%;overflow:hidden;background:rgb(154,196,217)}
+.md-strip{position:absolute;left:0;top:0;height:100%;display:flex;width:max-content;animation:mdDrift 260s linear infinite;will-change:transform}
+.md-strip img{height:100%;width:auto;flex:none;display:block;user-select:none}
+@keyframes mdDrift{to{transform:translateX(-33.3333%)}}
+.meadow[data-wx="cloudy"] .md-strip,.meadow[data-wx="fog"] .md-strip{animation-duration:420s}
+.meadow[data-wx="rain"] .md-strip{animation-duration:160s}
+.meadow[data-wx="storm"] .md-strip{animation-duration:110s}
+.md-hill{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;pointer-events:none}
+.md-stars{position:absolute;left:0;top:0;width:100%;height:60%;opacity:0;transition:opacity 1.2s;pointer-events:none}
+.md-stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#FFF8DC;box-shadow:0 0 6px #FFF0B8;animation:twinkle 3s ease-in-out infinite}
+.md-tint{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 1.2s,background 1.2s}
+.md-rain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.md-flash{position:absolute;inset:0;pointer-events:none;background:#fff;opacity:0}
+.md-flash.bolt{animation:bolt 1.1s ease-out}
+@keyframes bolt{0%,100%{opacity:0}6%{opacity:.75}12%{opacity:.1}18%{opacity:.55}40%{opacity:0}}
+.md-sky,.md-hill{transition:filter 1.2s}
+.meadow[data-wx="cloudy"] .md-sky{filter:saturate(.75) brightness(.95)}
+.meadow[data-wx="fog"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(235,240,245,.2),rgba(235,240,245,.55))}
+.meadow[data-wx="rain"] .md-sky,.meadow[data-wx="storm"] .md-sky{filter:grayscale(.55) brightness(.78) contrast(1.05)}
+.meadow[data-wx="rain"] .md-hill,.meadow[data-wx="storm"] .md-hill{filter:saturate(.8) brightness(.78)}
+.meadow[data-wx="rain"] .md-tint,.meadow[data-wx="storm"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(40,55,80,.35),rgba(30,45,60,.25))}
+.meadow[data-day="0"] .md-sky{filter:brightness(.38) saturate(.7) hue-rotate(12deg)}
+.meadow[data-day="0"] .md-hill{filter:brightness(.4) saturate(.7)}
+.meadow[data-day="0"] .md-stars{opacity:1}
+.meadow[data-day="0"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(18,24,70,.45),rgba(10,20,40,.25))}
+.meadow[data-day="0"][data-wx="rain"] .md-stars,.meadow[data-day="0"][data-wx="storm"] .md-stars{opacity:0}
+
+/* greeting bar, sits where the photo had its bar */
+.md-greet{position:absolute;left:52.1%;top:49.9%;transform:translate(-50%,-50%);width:min(41.6%,calc(100vw - 32px));height:clamp(50px,11%,66px);display:flex;align-items:center;gap:10px;padding:0 8px 0 14px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.18));-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 30px -12px rgba(20,40,70,.45),inset 0 1px 0 rgba(255,255,255,.7);color:#fff;z-index:3;animation:greetIn 1s cubic-bezier(.2,1.2,.4,1) .3s backwards}
+@keyframes greetIn{from{opacity:0;transform:translate(-50%,-30%) scale(.95)}}
+.mg-ic{font-size:20px;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2))}
+.mg-line{flex:1;min-width:0;display:flex;align-items:center;overflow:hidden;white-space:nowrap}
+.mg-text{font-family:var(--display);font-weight:600;font-size:clamp(15px,1.6vw,19px);text-shadow:0 1px 6px rgba(20,40,70,.45);overflow:hidden;text-overflow:ellipsis}
+.mg-caret{width:2px;height:1.2em;margin-left:3px;background:#fff;border-radius:2px;animation:caret 1s steps(2) infinite;flex:none}
+@keyframes caret{50%{opacity:0}}
+.mg-go{flex:none;width:clamp(36px,5.2%,46px);aspect-ratio:1;border-radius:50%;background:#fff;color:#1E2230;display:grid;place-items:center;box-shadow:0 4px 12px -4px rgba(0,0,0,.35);transition:transform .25s}
+.mg-go:hover{transform:translateY(2px)}
+.mg-go svg{width:55%;height:55%}
+.md-weather{position:absolute;left:clamp(14px,3vw,36px);bottom:clamp(18px,4vh,40px);z-index:4;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;color:#fff;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);font-size:14px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.3)}
+.md-weather .wi{font-size:18px}
+.md-weather .wm{font-weight:500;font-size:12px;opacity:.85;padding-left:8px;border-left:1px solid rgba(255,255,255,.5)}
+.md-scroll{position:absolute;left:50%;bottom:clamp(16px,3.5vh,34px);transform:translateX(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:2px;color:#fff;font-size:13.5px;font-weight:600;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+.md-scroll i{display:block;width:22px;height:22px;animation:bob 1.8s ease-in-out infinite}
+.md-scroll svg{width:100%;height:100%;transform:rotate(-90deg)}
+@media (max-width:860px){.md-greet{left:50%}.md-scroll{display:none}.md-weather{left:50%;transform:translateX(-50%);white-space:nowrap}}
+
+/* lawn with the folders, continuing the photo's grass */
+.lawn{position:relative;padding:34px max(20px,calc((100% - 1180px) / 2)) 70px;background:repeating-linear-gradient(98deg,rgba(255,255,255,.05) 0 2px,transparent 2px 7px),repeating-linear-gradient(82deg,rgba(0,40,0,.07) 0 2px,transparent 2px 9px),linear-gradient(180deg,#618443,#4A7534 40%,#3B632B)}
+.lawn::before{content:"";position:absolute;left:0;right:0;top:-80px;height:80px;background:linear-gradient(180deg,rgba(97,132,67,0),#618443);pointer-events:none}
+.lawn .fold-title{position:relative}
+.fold-name{position:absolute;left:0;right:0;bottom:-26px;text-align:center;color:#fff;font-size:14px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.35);white-space:nowrap}
+.lawn .folds{row-gap:52px}
+.lawn .folds{grid-template-columns:repeat(5,1fr);gap:52px 22px}
+@media (max-width:1100px){.lawn .folds{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:860px){.lawn .folds{grid-template-columns:repeat(2,1fr);gap:46px 16px}}

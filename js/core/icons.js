@@ -11,6 +11,7 @@ const P = {
   music:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
   vocab:'<rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 15l2.5-7 2.5 7M8.8 13h3.4M15.5 10.5v4.5M15.5 12.5a1.8 1.8 0 1 1 0 .01"/>',
   planner:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4"/>',
+  claw:'<path d="M3 3h18M12 3v6"/><circle cx="12" cy="10.5" r="1.8"/><path d="M10.6 11.6L6.5 15.5l2.2 4M13.4 11.6l4.1 3.9-2.2 4"/>',
   profile:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',
   logout:'<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/>',
   plus:'<path d="M12 5v14M5 12h14"/>',
@@ -42,6 +43,7 @@ const APPS = [
   {id:'music',   name:'เพลงโปรด',       icon:'music',   c1:'#3EC6A6', c2:'#A3EAD6'},
   {id:'vocab',   name:'สมุดคำศัพท์',    icon:'vocab',   c1:'#F7B928', c2:'#FFE38C'},
   {id:'planner', name:'แพลนเนอร์',      icon:'planner', c1:'#6F8DFF', c2:'#B3C4FF'},
+  {id:'game',    name:'เกมคีบตุ๊กตา',   icon:'claw',    c1:'#FF7FA8', c2:'#FFC6D8'},
   {id:'profile', name:'โปรไฟล์',        icon:'profile', c1:'#C07CFF', c2:'#E6C8FF'}
 ];
 const appOf = id => APPS.find(a => a.id === id) || APPS[0];

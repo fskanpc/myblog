@@ -1,16 +1,6 @@
 /* =========================================================
-   HOME
+   HOME: live meadow photo + greeting + folders
    ========================================================= */
-const BLADES = (() => {
-  let d = ''; for(let x = 0; x < 64; x += 4){ const hgt = 6 + ((x * 7) % 12); d += `M${x} 18 L${x + 2} ${18 - hgt} L${x + 4} 18 Z `; }
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="18"><path d="${d}" fill="#86D068"/></svg>`;
-  return `url('data:image/svg+xml,${encodeURIComponent(svg)}')`;
-})();
-const HOME_STK = {
-  bunny:`<svg viewBox="0 0 140 196"><circle cx="70" cy="24" r="18" fill="none" stroke="#9AA0AE" stroke-width="7"/><circle cx="70" cy="24" r="18" fill="none" stroke="#D5D9E2" stroke-width="2.5"/>${[48,58,68,78].map(y => `<circle cx="70" cy="${y}" r="3.6" fill="#A7ADBB"/>`).join('')}<g transform="translate(0 6)"><ellipse cx="54" cy="92" rx="10" ry="26" fill="#F8A5C6" transform="rotate(-14 54 92)"/><ellipse cx="86" cy="92" rx="10" ry="26" fill="#F8A5C6" transform="rotate(14 86 92)"/><ellipse cx="54" cy="94" rx="4.5" ry="17" fill="#FFD3E4" transform="rotate(-14 54 94)"/><ellipse cx="86" cy="94" rx="4.5" ry="17" fill="#FFD3E4" transform="rotate(14 86 94)"/><ellipse cx="70" cy="160" rx="24" ry="22" fill="#F8A5C6"/><ellipse cx="38" cy="140" rx="8" ry="14" fill="#F8A5C6" transform="rotate(-50 38 140)"/><ellipse cx="102" cy="140" rx="8" ry="14" fill="#F8A5C6" transform="rotate(50 102 140)"/><ellipse cx="56" cy="182" rx="10" ry="7" fill="#F8A5C6"/><ellipse cx="84" cy="182" rx="10" ry="7" fill="#F8A5C6"/><circle cx="70" cy="128" r="30" fill="#FBB4D0"/><path d="M56 124q5-6 10 0M74 124q5-6 10 0" stroke="#5A2D44" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M62 134q8 12 16 0z" fill="#E0507A"/><circle cx="52" cy="134" r="5" fill="#FF7FA8" opacity=".6"/><circle cx="88" cy="134" r="5" fill="#FF7FA8" opacity=".6"/></g></svg>`,
-  star:`<svg viewBox="0 0 130 130"><path d="M65 8c4 0 6 2 8 6l12 26 28 4c7 1 9 8 4 13l-20 20 5 28c1 7-6 11-12 8l-25-13-25 13c-6 3-13-1-12-8l5-28-20-20c-5-5-3-12 4-13l28-4 12-26c2-4 4-6 8-6z" fill="#F4B942" stroke="#C98A1E" stroke-width="3"/><path d="M50 52l30 30M80 52L50 82" stroke="#B0781A" stroke-width="3.5" stroke-linecap="round"/><path d="M65 20l9 20" stroke="#FFE08A" stroke-width="4" stroke-linecap="round" opacity=".8"/></svg>`,
-  cherry:`<svg viewBox="0 0 150 140"><path d="M42 92C54 50 72 30 96 18M108 96C104 60 100 36 96 18" stroke="#5E8C3A" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M96 18c14-14 38-12 48-2-14 12-34 14-48 2z" fill="#7CC36A"/><path d="M96 18c-12-10-30-10-40-2 12 10 28 12 40 2z" fill="#8FD17A"/><circle cx="40" cy="104" r="28" fill="#E0374F"/><circle cx="108" cy="106" r="28" fill="#E0374F"/><circle cx="30" cy="94" r="7" fill="#fff" opacity=".45"/><circle cx="98" cy="96" r="7" fill="#fff" opacity=".45"/><circle cx="32" cy="106" r="2.8" fill="#3A1A20"/><circle cx="48" cy="106" r="2.8" fill="#3A1A20"/><path d="M36 113q4 3 8 0" stroke="#3A1A20" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="100" cy="108" r="2.8" fill="#3A1A20"/><circle cx="116" cy="108" r="2.8" fill="#3A1A20"/><path d="M104 117q4-4 8 0" stroke="#3A1A20" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`
-};
 const FOLDER_THEME = {
   diary:  {bg:'#FFDCE8', ink:'#E47AA3', tab:'#F8C3D6'},
   books:  {bg:'#FFF4E6', ink:'rgba(255,160,100,.45)', tab:'#FFD2AE', icon:'#EE8A4E'},
@@ -20,7 +10,8 @@ const FOLDER_THEME = {
   music:  {bg:'#E4F7EF', ink:'rgba(70,190,155,.55)', tab:'#BDE9D8', icon:'#2FA886'},
   vocab:  {bg:'#FFF6D6', ink:'#F2C24E', tab:'#FBE39B', icon:'#D39A12'},
   planner:{bg:'#EEF1FF', ink:'rgba(130,150,245,.5)', tab:'#CCD5FB', icon:'#6480EE'},
-  profile:{bg:'#FBE4B7', ink:'#F08CAA', tab:'#EFCB8A', icon:'#E0708F'}
+  profile:{bg:'#FBE4B7', ink:'#F08CAA', tab:'#EFCB8A', icon:'#E0708F'},
+  game:   {bg:'#FFE9F0', ink:'rgba(255,127,168,.35)', tab:'#FFC6D8', icon:'#F0648F'}
 };
 const FOLDER_PAT = (() => {
   const u = svg => `url('data:image/svg+xml,${encodeURIComponent(svg)}')`;
@@ -39,126 +30,62 @@ const FOLDER_PAT = (() => {
     music:`radial-gradient(circle,${T.music.ink} 0 3.5px,transparent 4px) 0 0/18px 18px,radial-gradient(circle,${T.music.ink} 0 2px,transparent 2.5px) 9px 9px/18px 18px,${T.music.bg}`,
     vocab:`linear-gradient(90deg,transparent 21%,${T.vocab.ink} 21% 22%,transparent 22% 24%,${T.vocab.ink} 24% 25%,transparent 25%),linear-gradient(180deg,transparent 12%,${T.vocab.ink} 12% 13.5%,transparent 13.5% 17%,${T.vocab.ink} 17% 18.5%,transparent 18.5%),${T.vocab.bg}`,
     planner:`repeating-linear-gradient(90deg,${T.planner.ink} 0 10px,transparent 10px 22px),${T.planner.bg}`,
-    profile:`${heart(T.profile.ink)} 0 0/40px 40px,${T.profile.bg}`
+    profile:`${heart(T.profile.ink)} 0 0/40px 40px,${T.profile.bg}`,
+    game:`radial-gradient(circle,#FFE38C 0 3px,transparent 3.5px) 6px 6px/22px 22px,repeating-linear-gradient(135deg,${T.game.ink} 0 9px,transparent 9px 18px),${T.game.bg}`
   };
 })();
 const FOLDER_TAB = Object.fromEntries(Object.entries(FOLDER_THEME).map(([k, v]) => [k, v.tab]));
 const FOLDER_ICON = Object.fromEntries(Object.entries(FOLDER_THEME).map(([k, v]) => [k, v.icon || v.ink]));
-/* ---- meadow background: fluffy clouds + grassy hill with little flowers (drawn, no photos) ---- */
-function seeded(seed){ let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
-const MEADOW_SVG = (() => {
-  const R = seeded(20260929), W = 1200, H = 1400;
-  const hill = x => 250 - 190 * Math.exp(-Math.pow((x - 600) / 300, 2)) - 18 * Math.sin(x / 120) + 10 * Math.sin(x / 47);
-  const back = x => 175 - 40 * Math.sin(x / 260 + 1.2) - 25 * Math.cos(x / 170);
-  const path = (f, step = 12) => { let d = `M0 ${f(0).toFixed(1)}`; for(let x = step; x <= W; x += step) d += ` L${x} ${f(x).toFixed(1)}`; return d + ` L${W} ${H} L0 ${H} Z`; };
-  const greens = ['#4E9E38','#5DAF44','#6BBE4E','#3F8A2E','#7ACB58','#88D466','#347A28'];
-  const fringe = (f, n, lenMin, lenMax, cols) => { let s = ''; for(let i = 0; i < n; i++){ const x = (i / n) * W + R() * 4; const y = f(x) + 3 + R() * 5; const l = lenMin + R() * (lenMax - lenMin); const lean = (R() - .5) * 10; s += `<path d="M${x.toFixed(1)} ${y.toFixed(1)} q${(lean / 2).toFixed(1)} ${(-l / 2).toFixed(1)} ${lean.toFixed(1)} ${(-l).toFixed(1)}" stroke="${cols[(R() * cols.length) | 0]}" stroke-width="${(1.4 + R() * 1.4).toFixed(1)}"/>`; } return s; };
-  // blades scattered across the hill body, shorter near the top (distance)
-  let body = '';
-  for(let i = 0; i < 1400; i++){
-    const x = R() * W, top = hill(x); const y = top + 10 + Math.pow(R(), .7) * (H - top - 10);
-    const depth = Math.min(1, (y - top) / 700); const l = 5 + depth * 22 + R() * 6; const lean = (R() - .5) * (6 + depth * 10);
-    body += `<path d="M${x.toFixed(1)} ${y.toFixed(1)} q${(lean / 2).toFixed(1)} ${(-l / 2).toFixed(1)} ${lean.toFixed(1)} ${(-l).toFixed(1)}" stroke="${greens[(R() * greens.length) | 0]}" stroke-width="${(1 + depth * 2).toFixed(1)}" opacity="${(.55 + R() * .45).toFixed(2)}"/>`;
-  }
-  // little white flowers
-  let flowers = '';
-  for(let i = 0; i < 120; i++){
-    const x = 30 + R() * (W - 60), top = hill(x); const y = top + 14 + Math.pow(R(), 1.3) * 520;
-    const s = .5 + Math.min(1.4, (y - top) / 300);
-    flowers += `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${s.toFixed(2)})"><circle cx="0" cy="-2.2" r="2"/><circle cx="2.1" cy="-.6" r="2"/><circle cx="1.3" cy="1.9" r="2"/><circle cx="-1.3" cy="1.9" r="2"/><circle cx="-2.1" cy="-.6" r="2"/><circle r="1.1" fill="#F6D65A"/></g>`;
-  }
-  // red wildflower clusters on both sides
-  let reds = '';
-  const cluster = (cx, spread, n) => { for(let i = 0; i < n; i++){ const x = cx + (R() - .5) * spread, top = hill(x), y = top - 4 + R() * 30; const h = 10 + R() * 16; const c = ['#E0503A','#D8452F','#EF7A4A','#C93A2A'][(R() * 4) | 0]; reds += `<path d="M${x.toFixed(1)} ${(y + h).toFixed(1)} l${((R() - .5) * 3).toFixed(1)} ${-h.toFixed(1)}" stroke="#4E8F34" stroke-width="1.2"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(2 + R() * 1.8).toFixed(1)}" fill="${c}"/>`; } };
-  cluster(120, 200, 55); cluster(300, 120, 25); cluster(930, 140, 30); cluster(1090, 180, 50);
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMin slice" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="mdBack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9D98A"/><stop offset=".4" stop-color="#7FC05E"/></linearGradient>
-      <linearGradient id="mdHill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8AD063"/><stop offset=".25" stop-color="#63B045"/><stop offset=".7" stop-color="#4A9A36"/><stop offset="1" stop-color="#3C8A2E"/></linearGradient>
-      <radialGradient id="mdLight" cx=".5" cy=".05" r=".6"><stop offset="0" stop-color="#EFFFD0" stop-opacity=".45"/><stop offset="1" stop-color="#EFFFD0" stop-opacity="0"/></radialGradient>
-    </defs>
-    <path d="${path(back)}" fill="url(#mdBack)"/>
-    <g fill="none" stroke-linecap="round">${fringe(back, 260, 5, 11, ['#8CCB6A','#9ED67C','#7DBD5C'])}</g>
-    <path d="${path(hill)}" fill="url(#mdHill)"/>
-    <path d="${path(hill)}" fill="url(#mdLight)"/>
-    <g fill="none" stroke-linecap="round">${body}</g>
-    <g fill="none" stroke-linecap="round">${fringe(hill, 420, 8, 22, greens)}</g>
-    <g>${reds}</g>
-    <g fill="#FFFFFF">${flowers}</g>
-  </svg>`;
-})();
-function meadowClouds(){
-  const R = seeded(77);
-  const spec = [[1, 5, 230], [24, 2, 170], [70, 4, 250], [88, 16, 180], [8, 26, 150], [80, 30, 140]];
-  return spec.map(([x, y, w], i) => {
-    let puffs = '';
-    const n = 14;
-    for(let k = 0; k < n; k++){
-      const t = k / (n - 1), px = 6 + t * 88 + (R() - .5) * 6, arch = Math.sin(t * Math.PI);
-      const size = 18 + arch * 26 + R() * 10, py = 62 - arch * 26 + (R() - .5) * 8;
-      puffs += `<i style="left:${px.toFixed(1)}%;top:${py.toFixed(1)}%;width:${size.toFixed(1)}%;"></i>`;
-    }
-    return `<div class="sticker md-cloud-wrap" data-depth="${(.6 + (i % 3) * .5).toFixed(1)}" style="left:${x}%;top:${y}%"><div class="md-cloud" style="--cw:${w}px;--cd:${60 + i * 9}s">${puffs}</div></div>`;
-  }).join('');
-}
+/* photo layers: sky strip (moves) + hill cut-out (still). Source photo 2940x1628 after 4x upscale */
+const MEADOW = {ar:2940 / 1628, skyH:63.575, tile:.7, fill:'rgb(154,196,217)'};
+let homeWeatherMode = null;
+function weatherMode(){ return homeWeatherMode || META.weatherMode || 'auto'; }
+
 VIEWS.home = async el => {
   const now = new Date(), hr = now.getHours();
   const hello = hr < 5 ? 'ดึกแล้วนะ' : hr < 12 ? 'อรุณสวัสดิ์' : hr < 17 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น';
   const name = META.name || T('เธอ');
   const data = {};
-  for(const s of ['diary','books','tarot','travel','screen','music','vocab','planner']) data[s] = await Store.list(s);
-  const todayTasks = data.planner.filter(t => t.date === ymd()).sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+  for(const s of ['planner','vocab','books']) data[s] = await Store.list(s);
+  const todayTasks = data.planner.filter(t => t.date === ymd());
   const left = todayTasks.filter(t => !t.done);
-  const reading = data.books.filter(b => b.status === 'reading');
   const toLearn = data.vocab.filter(w => !w.learned);
   const word = toLearn.length ? toLearn[now.getDate() % toLearn.length] : null;
-  const newest = arr => [...arr].sort((a, b) => b.createdAt - a.createdAt)[0];
-  const lastDiary = [...data.diary].sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.createdAt - a.createdAt)[0];
-  const lastTrip = [...data.travel].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
-  const song = newest(data.music);
+  const reading = data.books.find(b => b.status === 'reading');
 
-  const preview = {
-    diary: lastDiary ? `ล่าสุด ${esc(lastDiary.mood || '')} ${esc(lastDiary.title || thDate(lastDiary.date))}` : 'วันนี้เป็นยังไงบ้าง เขียนหน้าแรกกัน',
-    books: reading.length ? `กำลังอ่าน ${esc(reading[0].title)}` : `${data.books.length} เล่มบนชั้น`,
-    tarot: data.tarot.length ? `สะสมไว้ ${data.tarot.length} สำรับ` : 'ยังไม่มีสำรับในคลัง',
-    travel: lastTrip ? `ล่าสุด ${esc(lastTrip.place)}` : 'ยังไม่มีรูปบนราว',
-    screen: data.screen.length ? `ตั๋ว ${data.screen.length} ใบ` : 'ยังไม่มีตั๋วหนัง',
-    music: song ? `${esc(song.title)}${song.artist ? ' — ' + esc(song.artist) : ''}` : 'ยังไม่มีแผ่นเสียง',
-    vocab: word ? `${esc(word.word)} = ${esc(word.meaning)}` : 'จดคำแรกเพื่อเริ่มท่อง',
-    planner: todayTasks.length ? `วันนี้เหลือ ${left.length} จาก ${todayTasks.length} งาน` : 'วันนี้ยังว่าง',
-    profile: esc([META.mbti, zodiacOf(META.birthday) && 'ราศี' + zodiacOf(META.birthday)].filter(Boolean).join(' ') || 'พาสปอร์ตของฉัน')
-  };
-
-  const scene = h(`<section class="home-scene" style="--blades:${BLADES}">
-    <div class="hs-sky" aria-hidden="true">${meadowClouds()}</div>
-    <div class="hs-hill" aria-hidden="true">${MEADOW_SVG}</div>
-    <div class="hero-fold-wrap">
-      <div class="hf">
-        <div class="hf-back"></div>
-        <div class="hf-paper p1"><div class="row"><span>NAME ${esc(ppCut(name, 12))}</span><span>NO. ${passportId().slice(3, 7)}</span></div><div class="row" style="margin-top:12px"><span>TODAY ${ymd()}</span><span>TASKS ${todayTasks.length}</span></div></div>
-        <div class="hf-paper p2"></div>
-        <div class="hf-front">
-          <div class="hf-star" aria-hidden="true"></div>
-          <p class="handle">@${esc(name)}</p>
-          <h1><span class="word" style="animation-delay:.05s">${hello}</span><br><span class="word" style="animation-delay:.18s">${esc(name)}</span></h1>
-          <p class="sub">${dayLine(ymd())}</p>
-          <div class="todo">${left.slice(0, 2).map(t => `<a href="#planner">${t.time ? esc(t.time) + ' ' : ''}${esc(ppCut(t.text, 18))}</a>`).join('')}${word ? `<a href="#vocab">คำวันนี้ ${esc(word.word)}</a>` : ''}</div>
-        </div>
+  const hero = h(`<section class="meadow" aria-label="${T('หน้าแรก')}">
+    <div class="md-stage">
+      <div class="md-sky"><div class="md-strip">
+        <img src="img/sky-1600.webp" srcset="img/sky-800.webp 823w, img/sky-1600.webp 1543w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
+        <img src="img/sky-1600.webp" srcset="img/sky-800.webp 823w, img/sky-1600.webp 1543w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
+        <img src="img/sky-1600.webp" srcset="img/sky-800.webp 823w, img/sky-1600.webp 1543w" sizes="(max-width:860px) 160vw, 90vw" alt="" draggable="false">
+      </div></div>
+      <div class="md-stars"></div>
+      <img class="md-hill" src="img/hill-2400.webp" srcset="img/hill-1280.webp 1280w, img/hill-2400.webp 2400w" sizes="(max-width:860px) 230vw, 100vw" alt="" draggable="false" fetchpriority="high">
+      <div class="md-greet" role="status" aria-live="polite">
+        <span class="mg-ic" aria-hidden="true">☁️</span>
+        <span class="mg-line"><span class="mg-text"></span><span class="mg-caret"></span></span>
+        <button class="mg-go" aria-label="เลื่อนลงไปที่แฟ้ม">${ic('left', 'style="transform:rotate(-90deg)"')}</button>
       </div>
-      <div class="hstk bunny sticker" data-depth="1.6" aria-hidden="true"><span class="stk">${HOME_STK.bunny}</span></div>
-      <div class="hstk star sticker" data-depth="2.2" aria-hidden="true"><span class="stk" style="--d:4.4s">${HOME_STK.star}</span></div>
-      <div class="hstk cherry sticker" data-depth="1.2" aria-hidden="true"><span class="stk" style="--d:5.6s">${HOME_STK.cherry}</span></div>
     </div>
+    <div class="md-tint"></div>
+    <canvas class="md-rain" aria-hidden="true"></canvas>
+    <div class="md-flash"></div>
+    <button class="md-weather"><span class="wi">☁️</span><span class="wt">กำลังดูสภาพอากาศ…</span><span class="wm"></span></button>
+    <button class="md-scroll">เลื่อนลงเพื่อเปิดแฟ้ม<i>${ic('left')}</i></button>
+  </section>`);
+  const lawn = h(`<section class="lawn" id="folders">
     <h2 class="fold-title">แฟ้มของฉัน</h2>
     <nav class="folds" aria-label="แฟ้มทั้งหมด"></nav>
   </section>`);
 
-  const folds = $('.folds', scene);
+  const folds = $('.folds', lawn);
   APPS.filter(a => a.id !== 'home').forEach(a => {
     const f = h(`<a class="fold" href="#${a.id}" aria-label="${a.name}" title="${a.name}" style="--pat:${FOLDER_PAT[a.id]};--tabc:${FOLDER_TAB[a.id]};--fic:${FOLDER_ICON[a.id]}">
       <span class="fold-back"></span>
       <span class="fold-paper"></span><span class="fold-paper two"></span>
       <span class="fold-front"><span class="fi">${ic(a.icon)}</span></span>
+      <span class="fold-name">${a.name}</span>
     </a>`);
     f.addEventListener('click', e => {
       if(REDUCED || e.metaKey || e.ctrlKey) return;
@@ -169,5 +96,110 @@ VIEWS.home = async el => {
     });
     folds.append(f);
   });
-  el.append(scene);
+  el.append(hero, lawn);
+
+  /* keep the photo layers "cover"-fitted together */
+  const stage = $('.md-stage', hero);
+  const fit = () => {
+    if(!hero.isConnected) return removeEventListener('resize', fit);
+    const r = hero.getBoundingClientRect(), w = Math.max(r.width, r.height * MEADOW.ar);
+    stage.style.width = w + 'px'; stage.style.height = (w / MEADOW.ar) + 'px';
+  };
+  addEventListener('resize', fit); requestAnimationFrame(fit);
+
+  const toFolders = () => lawn.scrollIntoView({behavior: REDUCED ? 'auto' : 'smooth', block:'start'});
+  $('.mg-go', hero).onclick = toFolders; $('.md-scroll', hero).onclick = toFolders;
+
+  /* stars for the night sky */
+  const stars = $('.md-stars', hero);
+  for(let i = 0; i < 70; i++){ const s = document.createElement('i'); s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 55 + '%'; s.style.animationDelay = (-Math.random() * 3) + 's'; stars.append(s); }
+
+  /* greeting messages typed into the glass bar */
+  const msgs = [`${T(hello)} ${name}`];
+  const typer = typeLoop($('.mg-text', hero), msgs);
+
+  /* weather */
+  let wx = null;
+  const applyWeather = () => {
+    const mode = weatherMode();
+    let kind = wx ? wx.kind : 'clear', day = wx ? wx.day : (hr >= 6 && hr < 18);
+    if(mode === 'sun'){ kind = 'clear'; day = true; }
+    if(mode === 'rain'){ kind = 'rain'; }
+    hero.dataset.wx = kind; hero.dataset.day = day ? '1' : '0';
+    $('.md-weather .wi', hero).textContent = day || kind !== 'clear' ? Weather.icon(kind) : '🌙';
+    $('.md-weather .wt', hero).textContent = (wx && mode === 'auto' ? `${wx.temp}° ` : '') + T(Weather.label(kind));
+    $('.md-weather .wm', hero).textContent = T(({auto:'อัตโนมัติ', sun:'โหมดแดดดี', rain:'โหมดฝนตก'})[mode]);
+    $('.mg-ic', hero).textContent = day || kind !== 'clear' ? Weather.icon(kind) : '🌙';
+    Rain.set($('.md-rain', hero), kind === 'rain' || kind === 'storm', kind === 'storm', $('.md-flash', hero));
+    // messages
+    msgs.length = 0;
+    msgs.push(`${T(hello)} ${name}`);
+    if(wx && mode === 'auto') msgs.push(LANG === 'en' ? `It's ${wx.temp}° and ${T(Weather.label(wx.kind)).toLowerCase()}${wx.place ? ' in ' + wx.place : ''}` : `ตอนนี้ ${wx.temp}° ${Weather.label(wx.kind)}${wx.place ? 'ที่' + wx.place : ''}`);
+    if(kind === 'rain' || kind === 'storm') msgs.push(T('ฝนตกอยู่ พกร่มด้วยนะ'));
+    else if(day) msgs.push(T('วันนี้อากาศดี ออกไปเดินเล่นกัน'));
+    else msgs.push(T('ดึกแล้ว พักผ่อนเยอะ ๆ นะ'));
+    if(todayTasks.length) msgs.push(LANG === 'en' ? `${left.length} of ${todayTasks.length} tasks left today` : `วันนี้เหลืออีก ${left.length} จาก ${todayTasks.length} งาน`);
+    if(word) msgs.push(`${T('คำศัพท์วันนี้')}: ${word.word}`);
+    if(reading) msgs.push(`${T('กำลังอ่าน')} ${reading.title}`);
+  };
+  requestAnimationFrame(() => requestAnimationFrame(applyWeather));   // after the page is on screen, so the rain canvas can size itself
+  applyWeather();
+  $('.md-weather', hero).onclick = async () => {
+    const order = ['auto', 'sun', 'rain'];
+    homeWeatherMode = order[(order.indexOf(weatherMode()) + 1) % 3];
+    META.weatherMode = homeWeatherMode; applyWeather();
+    toast(T(({auto:'สภาพอากาศตามจริง', sun:'เปลี่ยนเป็นวันแดดดี', rain:'เปลี่ยนเป็นวันฝนตก'})[homeWeatherMode]));
+    try{ await Store.setMeta(META); }catch(e){}
+  };
+  Weather.current().then(d => { wx = d; if(hero.isConnected) applyWeather(); }).catch(() => {
+    if(hero.isConnected) $('.md-weather .wt', hero).textContent = T('ดูสภาพอากาศไม่ได้');
+  });
 };
+
+/* typewriter that understands Thai combining marks */
+function typeLoop(el, msgs){
+  const seg = (window.Intl && Intl.Segmenter) ? new Intl.Segmenter(LANG === 'en' ? 'en' : 'th', {granularity:'grapheme'}) : null;
+  const split = s => seg ? [...seg.segment(s)].map(x => x.segment) : [...s];
+  let i = 0;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  (async () => {
+    for(let n = 0; !el.isConnected && n < 100; n++) await wait(50);   // the view is built before it is put on the page
+    while(el.isConnected){
+      const msg = msgs[i % msgs.length] || ''; const g = split(msg);
+      if(REDUCED){ el.textContent = msg; await wait(4000); i++; continue; }
+      for(let k = 1; k <= g.length && el.isConnected; k++){ el.textContent = g.slice(0, k).join(''); await wait(55); }
+      await wait(2600);
+      for(let k = g.length; k >= 0 && el.isConnected; k--){ el.textContent = g.slice(0, k).join(''); await wait(22); }
+      await wait(350); i++;
+    }
+  })();
+}
+
+/* rain on a canvas, only while the home page is on screen */
+const Rain = (() => {
+  let cv, ctx, drops = [], on = false, storm = false, flash, raf = 0, W = 0, H = 0, nextBolt = 0;
+  function size(){ const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0); }
+  function seed(){ const n = Math.round(W * H / 2600); drops = Array.from({length:n}, () => ({x:Math.random() * W, y:Math.random() * H, l:10 + Math.random() * 16, v:9 + Math.random() * 9, o:.18 + Math.random() * .35})); }
+  function tick(t){
+    if(!cv || !cv.isConnected || !on){ raf = 0; if(ctx) ctx.clearRect(0, 0, W, H); return; }
+    ctx.clearRect(0, 0, W, H); ctx.lineWidth = 1; ctx.lineCap = 'round';
+    for(const d of drops){
+      d.y += d.v; d.x -= d.v * .18;
+      if(d.y > H){ d.y = -d.l; d.x = Math.random() * (W + 60); }
+      ctx.strokeStyle = `rgba(225,235,255,${d.o})`;
+      ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + d.l * .18, d.y - d.l); ctx.stroke();
+    }
+    if(storm && flash && t > nextBolt){ flash.classList.remove('bolt'); void flash.offsetWidth; flash.classList.add('bolt'); nextBolt = t + 6000 + Math.random() * 9000; }
+    raf = requestAnimationFrame(tick);
+  }
+  return {
+    set(canvas, rain, isStorm, flashEl){
+      cv = canvas; ctx = cv.getContext('2d'); flash = flashEl; storm = isStorm; on = rain;
+      if(!on){ ctx.clearRect(0, 0, cv.width, cv.height); return; }
+      size(); seed();
+      if(!canvas._rs){ canvas._rs = true; addEventListener('resize', () => { if(cv && cv.isConnected){ size(); seed(); } }); }
+      if(REDUCED){ drops.forEach(d => d.v = 2); }
+      if(!raf) raf = requestAnimationFrame(tick);
+    }
+  };
+})();
