@@ -177,3 +177,66 @@ body[data-route="home"] .topbar{position:fixed;left:0;right:0;margin:0 auto;top:
 .md-stars{height:40%;z-index:0}
 .art-credit{position:relative;margin:48px 0 0;text-align:center;font-size:12px;color:rgba(255,255,255,.75)}
 .art-credit a{color:#fff}
+
+/* ================= seaside scene ================= */
+.meadow{background:#A9DDF6}
+.sea-scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sea-scene .sky-night,.sea-scene .sea-night,.sea-scene .stars,.sea-scene .moon,.sea-scene .moonpath{opacity:0;transition:opacity 1.6s}
+.sea-scene .sun,.sea-scene .birds,.sea-scene .glitter,.sea-scene .sky-day,.sea-scene .sea-day{transition:opacity 1.6s}
+.meadow[data-day="0"] .sky-night,.meadow[data-day="0"] .sea-night,.meadow[data-day="0"] .stars,.meadow[data-day="0"] .moon,.meadow[data-day="0"] .moonpath{opacity:1}
+.meadow[data-day="0"] .sun,.meadow[data-day="0"] .birds,.meadow[data-day="0"] .glitter{opacity:0}
+.meadow[data-day="0"] .clouds{opacity:.35}
+.meadow[data-day="0"] .walker,.meadow[data-day="0"] .palms,.meadow[data-day="0"] .boat,.meadow[data-day="0"] .dolphin{filter:brightness(.62) saturate(.85)}
+.meadow[data-day="0"] .md-tint{background:linear-gradient(180deg,transparent 0 56%,rgba(12,20,60,.38) 70%,rgba(10,16,48,.5))!important}
+.sea-scene .tw{animation:tw 3s ease-in-out infinite}
+@keyframes tw{50%{opacity:.25}}
+.sea-scene .rays{transform-box:fill-box;transform-origin:center;animation:spin 80s linear infinite}
+.sea-scene .island{fill:#8CC3D3;transition:fill 1.6s}
+.meadow[data-day="0"] .island{fill:#2A3470}
+.sea-scene .cl{animation:clDrift linear infinite}
+@keyframes clDrift{from{transform:translateX(1950px)}to{transform:translateX(-350px)}}
+.sea-scene .flock{animation:flock 70s linear infinite}
+@keyframes flock{from{transform:translate(-160px,40px)}to{transform:translate(1760px,-30px)}}
+.sea-scene .wing{transform-box:fill-box;transform-origin:center;animation:flap .45s ease-in-out infinite alternate}
+@keyframes flap{to{transform:scaleY(.35)}}
+.sea-scene .wv{animation:wv 8s ease-in-out infinite alternate}
+@keyframes wv{to{transform:translateX(-70px)}}
+.sea-scene .gl{opacity:.85;animation:gl 2.6s ease-in-out infinite}
+@keyframes gl{50%{opacity:.15}}
+.sea-scene .boat-move{animation:boat 160s linear infinite}
+@keyframes boat{from{transform:translate(-120px,592px)}to{transform:translate(1720px,592px)}}
+.sea-scene .boat-rock{transform-box:fill-box;transform-origin:50% 100%;animation:rock 3.4s ease-in-out infinite alternate}
+@keyframes rock{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+.sea-scene .foam{animation:foam 5.5s ease-in-out infinite}
+@keyframes foam{0%,100%{transform:translateY(0);opacity:.95}50%{transform:translateY(9px);opacity:.45}}
+.sea-scene .walker{animation:walk 46s linear infinite}
+@keyframes walk{
+  0%{transform:translate(520px,0) scale(1,1)}
+  47%{transform:translate(980px,0) scale(1,1)}
+  50%{transform:translate(1116px,0) scale(-1,1)}
+  97%{transform:translate(656px,0) scale(-1,1)}
+  100%{transform:translate(520px,0) scale(1,1)}}
+.sea-scene .leg,.sea-scene .arm{transform-box:fill-box;transform-origin:50% 0;animation:stride .55s ease-in-out infinite alternate}
+.sea-scene .l2,.sea-scene .a1{animation-direction:alternate-reverse}
+@keyframes stride{from{transform:rotate(16deg)}to{transform:rotate(-16deg)}}
+.sea-scene .bob{animation:bob2 .55s ease-in-out infinite alternate}
+.sea-scene .dbob{animation:bob2 .3s ease-in-out infinite alternate}
+@keyframes bob2{to{transform:translateY(-3px)}}
+.sea-scene .dleg{transform-box:fill-box;transform-origin:50% 0;animation:stride .3s ease-in-out infinite alternate}
+.sea-scene .d2,.sea-scene .d3{animation-direction:alternate-reverse}
+.sea-scene .tail{transform-box:fill-box;transform-origin:100% 100%;animation:wag .32s ease-in-out infinite alternate}
+@keyframes wag{from{transform:rotate(-14deg)}to{transform:rotate(16deg)}}
+.sea-scene .sway{animation:palm 6s ease-in-out infinite alternate}
+@keyframes palm{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+.meadow[data-wx="rain"] .sun,.meadow[data-wx="storm"] .sun,.meadow[data-wx="rain"] .birds,.meadow[data-wx="storm"] .birds,.meadow[data-wx="rain"] .glitter,.meadow[data-wx="storm"] .glitter,.meadow[data-wx="rain"] .stars,.meadow[data-wx="storm"] .stars{opacity:0}
+.meadow[data-wx="rain"] .clouds,.meadow[data-wx="storm"] .clouds{filter:brightness(.78)}
+.meadow[data-wx="rain"] .cl,.meadow[data-wx="storm"] .cl{animation-duration:80s!important}
+.meadow[data-wx="cloudy"] .sun{opacity:.55}
+.md-greet{top:34%}
+@media (max-width:860px){.md-greet{top:30%}}
+/* beach-coloured strip for the folders */
+.lawn{background:linear-gradient(180deg,#F1D6A4,#EBC98E 50%,#E2BC7F)}
+.lawn::before{background:linear-gradient(180deg,rgba(241,214,164,0),#F1D6A4)}
+.lawn .fold-title{color:#6B4A2E;text-shadow:none}
+.fold-name{color:#6B4A2E;text-shadow:none}
+@media (max-width:860px){.md-greet{width:calc(100vw - 32px)}}
