@@ -17,19 +17,21 @@ async function cycleTheme(){
 /* =========================================================
    shell & router
    ========================================================= */
+/* width available for page content (used by layouts that measure themselves) */
+function contentWidth(){ return innerWidth > 860 ? Math.min(innerWidth, 1320) - 72 : innerWidth - 32; }
 function renderShell(){
   const app = $('#app');
   app.innerHTML = '';
-  const side = h(`<aside class="side glass" aria-label="เมนูหลัก">
-    <div class="brand"><div class="brand-orb"></div><span>${esc(META.siteName || 'My Little Bubble')}</span></div>
-    <nav class="nav">${APPS.map(a => `<a href="#${a.id}" data-r="${a.id}"><span class="ic" style="--c1:${a.c1};--c2:${a.c2}">${ic(a.icon)}</span><span class="lbl">${a.name}</span></a>`).join('')}</nav>
-    <div class="side-foot">
+  const bar = h(`<header class="topbar glass" aria-label="แถบด้านบน">
+    <a class="tb-brand" href="#home" aria-label="หน้าแรก"><span class="brand-orb"></span><span>${esc(META.siteName || 'My Little Bubble')}</span></a>
+    <a class="tb-home" href="#home">${ic('home')}<span>แฟ้มของฉัน</span></a>
+    <div class="tb-acts">
       <button class="icon-btn" id="themeBtn" aria-label="เปลี่ยนธีม"></button>
       <button class="icon-btn lang-btn" id="langBtn" aria-label="เปลี่ยนภาษา" title="เปลี่ยนภาษา">${LANG === 'en' ? 'TH' : 'EN'}</button>
       <button class="icon-btn" id="outBtn" aria-label="ออกจากระบบ" title="ออกจากระบบ">${ic('logout')}</button>
     </div>
-  </aside>`);
-  app.append(side, h('<main id="main" tabindex="-1"></main>'));
+  </header>`);
+  app.append(bar, h('<main id="main" tabindex="-1"></main>'));
   $('#themeBtn').onclick = cycleTheme;
   $('#langBtn').onclick = () => setLang(LANG === 'en' ? 'th' : 'en');
   $('#outBtn').onclick = () => Auth.logout();
@@ -44,8 +46,6 @@ async function route(){
   const r = (location.hash.slice(1) || 'home').split('/')[0];
   const id = VIEWS[r] ? r : 'home';
   document.body.dataset.route = id;
-  $$('.nav a').forEach(a => a.classList.toggle('on', a.dataset.r === id));
-  const on = $('.nav a.on'); if(on && innerWidth <= 860) on.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
   const main = $('#main');
   const token = ++routeToken;
   const frag = document.createElement('div');

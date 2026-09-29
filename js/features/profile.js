@@ -32,7 +32,7 @@ VIEWS.profile = async el => {
   const counts = {};
   for(const s of ['diary','books','tarot','travel','screen','music','vocab','planner']) counts[s] = (await Store.list(s)).length;
   const booksDone = (await Store.list('books')).filter(b => b.status === 'done').length;
-  const content = innerWidth > 860 ? Math.min(innerWidth - 268, 1320) - 72 : innerWidth - 32;
+  const content = contentWidth();
   const stack = content < 1040;
   const zoom = Math.min(1, (stack ? content : 600) / 600);
   const name = META.name || '';

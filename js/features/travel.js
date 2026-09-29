@@ -164,7 +164,7 @@ const DECO_CYCLE = ['bow','star','cookie','gingham','heart','star'];
 VIEWS.travel = async el => {
   const items = [...await Store.list('travel')].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   if(travelView === 'tickets') return travelTickets(el, items);
-  const content = innerWidth > 860 ? Math.min(innerWidth - 268, 1320) - 72 : innerWidth - 32;
+  const content = contentWidth();
   const k = content < 640 ? .74 : content < 900 ? .88 : 1;
   const perRow = content < 640 ? 2 : content < 1000 ? 3 : 4;
   const pw = Math.round(176 * k);
@@ -247,7 +247,7 @@ async function travelTickets(el, items){
   el.append(pageHead('ที่เที่ยวของฉัน', 'ตั๋วความทรงจำจากทุกการเดินทาง', 'เพิ่มที่เที่ยว', () => Travel.add()));
   el.append(travelToggle());
   const cities = new Set(items.map(i => (i.city || '').trim()).filter(Boolean));
-  const content = innerWidth > 860 ? Math.min(innerWidth - 268, 1320) - 72 : innerWidth - 32;
+  const content = contentWidth();
   const tp = travelPassport(items, cities, Math.min(.8, content / 600)); tp.style.cssText = 'display:block;width:fit-content;margin:0 auto 28px';
   el.append(tp);
   if(!items.length) return el.append(emptyState('travel', 'ยังไม่มีตั๋วใบแรก ไปเที่ยวที่ไหนมาบ้าง', 'เพิ่มที่เที่ยว', () => Travel.add()));

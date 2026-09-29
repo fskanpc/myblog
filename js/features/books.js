@@ -61,7 +61,7 @@ VIEWS.books = async el => {
   const done = all.filter(b => b.status === 'done'), rated = all.filter(b => b.rating);
   const avg = rated.length ? (rated.reduce((s, b) => s + b.rating, 0) / rated.length).toFixed(1) : '–';
 
-  const content = innerWidth > 860 ? Math.min(innerWidth - 268, 1320) - 72 : innerWidth - 32;
+  const content = contentWidth();
   const k = content < 640 ? .7 : content < 900 ? .85 : 1;
   const wallPad = content < 640 ? 28 : 72;
   const avail = content - wallPad - (content < 640 ? 20 : 48);
