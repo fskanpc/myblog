@@ -215,8 +215,9 @@ function clawMachine({compact = false, globalKeys = false} = {}){
       if(S.x <= CM.homeX){ S.state = 'release'; }
     } else if(S.state === 'release'){
       S.w = Math.min(CLAW.open, S.w + 1.2);
-      if(S.held && S.w >= S.held.r + 10){ const p = S.held; S.held = null; p.vy = 2; p.vx = .3; }
-      if(S.w >= CLAW.open){ S.w = S.target = CLAW.rest; S.state = 'idle'; renderCoins(); if(!plush.some(p => p.x < CM.chuteX && !p.won)) say(g.coins > 0 ? 'ใส่เหรียญเพื่อเล่นอีกครั้ง' : 'เหรียญวันนี้หมดแล้ว พรุ่งนี้มาใหม่นะ'); }
+      // let go once the arms have opened a little past the plush (big ones included)
+      if(S.held && S.w >= Math.min(S.held.r + 6, CLAW.open - 2)){ const p = S.held; S.held = null; p.vy = 2; p.vx = .3; }
+      if(S.w >= CLAW.open){ if(S.held){ S.held.vy = 2; S.held = null; } S.w = S.target = CLAW.rest; S.state = 'idle'; renderCoins(); if(!plush.some(p => p.x < CM.chuteX && !p.won)) say(g.coins > 0 ? 'ใส่เหรียญเพื่อเล่นอีกครั้ง' : 'เหรียญวันนี้หมดแล้ว พรุ่งนี้มาใหม่นะ'); }
     }
     if(S.held){ S.held.x = S.x; S.held.y = holdY(S.held); }
     physics();
