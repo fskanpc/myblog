@@ -7,8 +7,8 @@
 function trainScene(){
   const R = (() => { let s = 20260930; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; })();
   const W = 1200, H = 600;
-  // track: a straight line climbing to the right
-  const T0 = {x:-60, y:572}, ANG = -10.5, rad = ANG * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad);
+  // track: a straight, level line across the meadow
+  const T0 = {x:-60, y:448}, ANG = 0, rad = ANG * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad);
   const onTrack = s => ({x:T0.x + s * cos, y:T0.y + s * sin});
   const trackY = x => T0.y + (x - T0.x) * Math.tan(rad);
 
@@ -33,26 +33,33 @@ function trainScene(){
   // ---------- far range + the peak ----------
   const far = `<path class="far" d="M0 330 L90 262 L150 290 L240 214 L320 268 L400 236 L470 280 L560 250 L620 300 L700 300 L1000 300 L1060 232 L1120 262 L1200 214 L1200 400 L0 400Z"/>
     <path class="far-snow" d="M240 214 L262 232 L250 236 L238 228 L226 240 L218 230Z M1060 232 L1080 248 L1068 250 L1058 244 L1046 252 L1040 246Z M1200 214 L1200 236 L1188 232 L1176 240 L1180 226Z M90 262 L108 276 L96 278 L86 272 L74 280Z"/>`;
+  // three peaks: a small one each side and a well-proportioned main peak in the middle,
+  // each with a lit left face, a shaded right face and a jagged snow cap
+  const mtn = (ax, ay, lx, rx, fx, left, right, ridge, snowL, snowR) => `
+    <path class="pk-l" d="M${ax} ${ay} ${left.map(p => 'L' + p).join(' ')} L${lx} 400 L${fx} 400 ${ridge.slice().reverse().map(p => 'L' + p).join(' ')}Z"/>
+    <path class="pk-r" d="M${ax} ${ay} ${right.map(p => 'L' + p).join(' ')} L${rx} 400 L${fx} 400 ${ridge.slice().reverse().map(p => 'L' + p).join(' ')}Z"/>
+    <path class="snow" d="M${ax} ${ay} ${snowL.map(p => 'L' + p).join(' ')}Z"/>
+    <path class="snow snow-r" d="M${ax} ${ay} ${snowR.map(p => 'L' + p).join(' ')}Z"/>`;
   const peak = `<g class="peak">
-    <path class="pk-l" d="M520 400 L640 300 L700 250 L742 150 L760 96 L778 84 L790 100 L800 170 L776 250 L760 400Z"/>
-    <path class="pk-r" d="M790 100 L812 160 L860 220 L920 262 L1000 300 L1080 330 L1120 400 L760 400 L776 250 L800 170Z"/>
-    <path class="snow" d="M760 96 L778 84 L790 100 L796 136 L786 128 L778 146 L770 132 L758 150 L752 128Z"/>
-    <path class="snow" d="M742 150 L752 166 L740 176 L732 196 L722 188 L716 206 L706 200 Z M700 250 L716 256 L704 268 L690 262Z"/>
-    <path class="snow snow-r" d="M790 100 L812 160 L830 186 L818 184 L808 196 L802 176 L794 182 L796 136Z M860 220 L900 246 L886 250 L872 244 L862 254 L852 238Z"/>
-    <path class="snow" d="M640 300 L668 292 L700 296 L730 290 L760 300 L740 312 L716 306 L694 316 L670 306 L650 314Z"/>
-    <path class="snow snow-r" d="M760 300 L800 292 L850 296 L900 288 L960 296 L1000 300 L970 312 L930 306 L896 318 L860 308 L826 318 L794 308Z"/>
+    ${mtn(500, 206, 330, 650, 518, ['462 250', '412 308', '370 358'], ['540 248', '586 300', '628 358'], ['506 270', '512 330'],
+      ['462 250', '450 264', '468 268', '482 256', '494 274', '506 262', '506 240'], ['540 248', '552 262', '536 268', '522 256', '508 270', '506 262', '506 240'])}
+    ${mtn(962, 236, 850, 1110, 978, ['930 270', '896 320', '870 364'], ['990 266', '1036 316', '1080 364'], ['968 300', '974 350'],
+      ['930 270', '922 282', '938 284', '952 274', '964 288', '966 262'], ['990 266', '1000 280', '986 284', '974 276', '966 288', '966 262'])}
+    ${mtn(700, 108, 430, 990, 722, ['656 158', '612 204', '562 262', '500 330'], ['744 152', '792 198', '852 252', '922 324'], ['712 190', '706 280', '716 340'],
+      ['656 158', '612 204', '594 224', '614 232', '632 218', '650 242', '670 224', '690 248', '706 216', '712 190'],
+      ['744 152', '792 198', '812 220', '794 232', '776 216', '758 240', '740 222', '724 236', '708 216', '712 190'])}
   </g>`;
 
   // ---------- hills ----------
   let pines = '';
   for(let i = 0; i < 26; i++){
-    const x = 20 + R() * 480, base = 392 + (x / 480) * 18 + R() * 40, s = 10 + R() * 10;
+    const x = 20 + R() * 1160, base = 376 + R() * 22, s = 9 + R() * 9;
     pines += `<path d="M${x.toFixed(0)} ${(base - s * 2.4).toFixed(0)} L${(x + s).toFixed(0)} ${base.toFixed(0)} L${(x - s).toFixed(0)} ${base.toFixed(0)}Z"/>`;
   }
   const hills = `<path class="hill-far" d="M0 380 C 160 350, 330 360, 520 392 C 640 410, 760 400, 900 380 C 1020 364, 1120 360, 1200 368 L1200 600 L0 600Z"/>
     <g class="pines">${pines}</g>
-    <path class="hill-near" d="M0 470 C 260 440, 560 380, 820 320 C 960 290, 1080 262, 1200 240 L1200 600 L0 600Z"/>
-    <path class="hill-shade" d="M0 520 C 300 500, 600 460, 900 420 C 1020 404, 1120 390, 1200 380 L1200 600 L0 600Z"/>`;
+    <path class="hill-near" d="M0 402 C 260 390, 560 386, 820 390 C 980 393, 1100 398, 1200 394 L1200 600 L0 600Z"/>
+    <path class="hill-shade" d="M0 522 C 300 508, 700 504, 1200 518 L1200 600 L0 600Z"/>`;
 
   // ---------- track, poles and wire ----------
   let sleepers = '';
