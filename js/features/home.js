@@ -1,5 +1,5 @@
 /* =========================================================
-   HOME: greeting card + live seaside window + folders + claw machine
+   HOME: greeting card + photo window + folders + claw machine
    ========================================================= */
 const FOLDER_THEME = {
   diary:  {bg:'#FFDCE8', ink:'#E47AA3', tab:'#F8C3D6'},
@@ -92,8 +92,11 @@ VIEWS.home = async el => {
       <figure class="hm-window">
         <span class="hm-tape l" aria-hidden="true"></span><span class="hm-tape r" aria-hidden="true"></span>
         <div class="meadow">
-          ${seaScene()}
+          <img class="wn-photo" src="img/window-bubbles.jpg" alt="" decoding="async">
+          <div class="wn-storm"></div>
           <div class="md-tint"></div>
+          <div class="wn-night"><span class="wn-moonlight"></span><span class="wn-stars"></span><span class="wn-moon"></span></div>
+          <div class="wn-bubbles"></div>
           <canvas class="md-rain" aria-hidden="true"></canvas>
           <div class="md-flash"></div>
         </div>
@@ -113,6 +116,15 @@ VIEWS.home = async el => {
     </section>
   </div>`);
   const hero = $('.meadow', page);
+
+  /* window animation layers: floating bubbles (sunny) and twinkling stars (night) */
+  const bub = $('.wn-bubbles', hero);
+  for(let i = 0; i < 16; i++){
+    const size = 10 + Math.random() * 34, dur = 10 + Math.random() * 12;
+    bub.append(h(`<span class="bub" style="left:${(Math.random() * 96).toFixed(1)}%;--sz:${size.toFixed(0)}px;--dur:${dur.toFixed(1)}s;--dl:${(-Math.random() * dur).toFixed(1)}s;--sw:${(8 + Math.random() * 22).toFixed(0)}px;--sd:${(2.5 + Math.random() * 3).toFixed(1)}s"><i></i></span>`));
+  }
+  const stars = $('.wn-stars', hero);
+  for(let i = 0; i < 18; i++) stars.append(h(`<i style="left:${(Math.random() * 100).toFixed(1)}%;top:${(Math.random() * 34).toFixed(1)}%;animation-delay:${(-Math.random() * 3).toFixed(1)}s"></i>`));
 
   const deco = $('.hm-deco', page);
   HM_DECO.forEach(([k, x, y, s, r, d, cls]) => deco.append(h(`<span class="hm-stk ${cls || ''}" style="left:${x};top:${y};--s:${s}px;--r:${r}deg;--d:${d}s">${HM_STK[k]}</span>`)));
@@ -148,11 +160,12 @@ VIEWS.home = async el => {
     let kind = wx ? wx.kind : 'clear', day = wx ? wx.day : (hr >= 6 && hr < 18);
     if(mode === 'sun'){ kind = 'clear'; day = true; }
     if(mode === 'rain'){ kind = 'rain'; }
+    if(mode === 'night'){ kind = 'clear'; day = false; }
     hero.dataset.wx = kind; hero.dataset.day = day ? '1' : '0';
     const icon = day || kind !== 'clear' ? Weather.icon(kind) : '🌙';
     $('.md-weather .wi', page).textContent = icon;
     $('.md-weather .wt', page).textContent = (wx && mode === 'auto' ? `${wx.temp}° ` : '') + T(Weather.label(kind));
-    $('.md-weather .wm', page).textContent = T(({auto:'อัตโนมัติ', sun:'โหมดแดดดี', rain:'โหมดฝนตก'})[mode]);
+    $('.md-weather .wm', page).textContent = T(({auto:'อัตโนมัติ', sun:'โหมดแดดดี', rain:'โหมดฝนตก', night:'โหมดกลางคืน'})[mode]);
     $('.mg-ic', page).textContent = icon;
     Rain.set($('.md-rain', hero), kind === 'rain' || kind === 'storm', kind === 'storm', $('.md-flash', hero));
     // messages
@@ -169,10 +182,10 @@ VIEWS.home = async el => {
   requestAnimationFrame(() => requestAnimationFrame(applyWeather));   // after the page is on screen, so the rain canvas can size itself
   applyWeather();
   $('.md-weather', page).onclick = async () => {
-    const order = ['auto', 'sun', 'rain'];
-    homeWeatherMode = order[(order.indexOf(weatherMode()) + 1) % 3];
+    const order = ['auto', 'sun', 'rain', 'night'];
+    homeWeatherMode = order[(order.indexOf(weatherMode()) + 1) % order.length];
     META.weatherMode = homeWeatherMode; applyWeather();
-    toast(T(({auto:'สภาพอากาศตามจริง', sun:'เปลี่ยนเป็นวันแดดดี', rain:'เปลี่ยนเป็นวันฝนตก'})[homeWeatherMode]));
+    toast(T(({auto:'สภาพอากาศตามจริง', sun:'เปลี่ยนเป็นวันแดดดี', rain:'เปลี่ยนเป็นวันฝนตก', night:'เปลี่ยนเป็นกลางคืน'})[homeWeatherMode]));
     try{ await Store.setMeta(META); }catch(e){}
   };
   Weather.current().then(d => { wx = d; if(hero.isConnected) applyWeather(); }).catch(() => {
@@ -180,7 +193,7 @@ VIEWS.home = async el => {
   });
 };
 
-Object.assign(DICT, {'หน้าต่างวันนี้':'Today’s window', 'เขียนบันทึกวันนี้':'Write today’s entry', 'เปลี่ยนโหมดสภาพอากาศ':'Change weather mode'});
+Object.assign(DICT, {'หน้าต่างวันนี้':'Today’s window', 'เขียนบันทึกวันนี้':'Write today’s entry', 'เปลี่ยนโหมดสภาพอากาศ':'Change weather mode', 'โหมดกลางคืน':'Night mode', 'เปลี่ยนเป็นกลางคืน':'Switched to night'});
 
 /* typewriter that understands Thai combining marks */
 function typeLoop(el, msgs){
