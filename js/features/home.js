@@ -1,5 +1,5 @@
 /* =========================================================
-   HOME: live meadow photo + greeting + folders
+   HOME: greeting card + live seaside window + folders + claw machine
    ========================================================= */
 const FOLDER_THEME = {
   diary:  {bg:'#FFDCE8', ink:'#E47AA3', tab:'#F8C3D6'},
@@ -36,9 +36,23 @@ const FOLDER_PAT = (() => {
 })();
 const FOLDER_TAB = Object.fromEntries(Object.entries(FOLDER_THEME).map(([k, v]) => [k, v.tab]));
 const FOLDER_ICON = Object.fromEntries(Object.entries(FOLDER_THEME).map(([k, v]) => [k, v.icon || v.ink]));
-/* photo layers: sky strip (moves) + hill cut-out (still). Source photo 2940x1628 after 4x upscale */
 let homeWeatherMode = null;
 function weatherMode(){ return homeWeatherMode || META.weatherMode || 'auto'; }
+
+/* little sticker doodles scattered on the page (original artwork) */
+const HM_STK = {
+  star:'<svg viewBox="0 0 40 40"><path d="M20 3l5 10.5 11.5 1.4-8.4 8 2.2 11.4L20 28.8 9.7 34.3l2.2-11.4-8.4-8L15 13.5z" fill="#FFD66B" stroke="#E9A93A" stroke-width="2" stroke-linejoin="round"/><circle cx="16" cy="19" r="1.4" fill="#6B4A3A"/><circle cx="24" cy="19" r="1.4" fill="#6B4A3A"/><path d="M17.5 23q2.5 2 5 0" stroke="#6B4A3A" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>',
+  heart:'<svg viewBox="0 0 40 40"><path d="M20 35S5 26 5 15a8 8 0 0 1 15-4 8 8 0 0 1 15 4c0 11-15 20-15 20z" fill="#FF8FB5" stroke="#E0648F" stroke-width="2"/><path d="M11 14a4 4 0 0 1 4-4" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>',
+  sparkle:'<svg viewBox="0 0 40 40"><path d="M20 2c1.5 9 4 12 16 18-12 6-14.5 9-16 18-1.5-9-4-12-16-18 12-6 14.5-9 16-18z" fill="#C9B2FF" stroke="#9D82F0" stroke-width="2" stroke-linejoin="round"/></svg>',
+  smile:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="#9FE3CB" stroke="#4FB892" stroke-width="2"/><circle cx="14.5" cy="17" r="2" fill="#2F6B58"/><circle cx="25.5" cy="17" r="2" fill="#2F6B58"/><path d="M13 23q7 7 14 0" stroke="#2F6B58" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>',
+  flower:'<svg viewBox="0 0 40 40"><g fill="#FFC6A8" stroke="#F09A6E" stroke-width="1.8"><circle cx="20" cy="9" r="7"/><circle cx="31" cy="17" r="7"/><circle cx="27" cy="30" r="7"/><circle cx="13" cy="30" r="7"/><circle cx="9" cy="17" r="7"/></g><circle cx="20" cy="21" r="6" fill="#FFE38C" stroke="#E9A93A" stroke-width="1.8"/></svg>',
+  bow:'<svg viewBox="0 0 48 32"><path d="M24 16C16 4 4 4 4 14s12 10 20 2zM24 16c8-12 20-12 20-2s-12 10-20 2z" fill="#FF9DBE" stroke="#E0648F" stroke-width="2" stroke-linejoin="round"/><path d="M21 17l-5 12M27 17l5 12" stroke="#E0648F" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="16" r="4" fill="#FFB8CF" stroke="#E0648F" stroke-width="2"/></svg>'
+};
+const HM_DECO = [
+  ['star', '-1%', '2%', 54, -12, 6], ['bow', '44%', '-1%', 50, 8, 7, 'hide-sm'], ['sparkle', '97%', '4%', 36, 0, 5],
+  ['heart', '.5%', '46%', 40, -10, 6.5, 'hide-sm'], ['smile', '96%', '44%', 46, 12, 7], ['flower', '52%', '33.5%', 38, -6, 8, 'hide-sm'],
+  ['sparkle', '2%', '94%', 30, 0, 5.5, 'hide-sm'], ['star', '95%', '93%', 40, 14, 6.5], ['heart', '60%', '97%', 32, 10, 7, 'hide-sm']
+];
 
 VIEWS.home = async el => {
   const now = new Date(), hr = now.getHours();
@@ -52,26 +66,59 @@ VIEWS.home = async el => {
   const word = toLearn.length ? toLearn[now.getDate() % toLearn.length] : null;
   const reading = data.books.find(b => b.status === 'reading');
 
-  const hero = h(`<section class="meadow" aria-label="${T('หน้าแรก')}">
-    ${seaScene()}
-    <div class="md-greet" role="status" aria-live="polite">
-      <span class="mg-ic" aria-hidden="true">☁️</span>
-      <span class="mg-line"><span class="mg-text"></span><span class="mg-caret"></span></span>
-      <button class="mg-go" aria-label="เลื่อนลงไปที่แฟ้ม">${ic('left', 'style="transform:rotate(-90deg)"')}</button>
-    </div>
-    <div class="md-tint"></div>
-    <canvas class="md-rain" aria-hidden="true"></canvas>
-    <div class="md-flash"></div>
-    <button class="md-weather"><span class="wi">☁️</span><span class="wt">กำลังดูสภาพอากาศ…</span><span class="wm"></span></button>
-    <button class="md-scroll">เลื่อนลงเพื่อเปิดแฟ้ม<i>${ic('left')}</i></button>
-  </section>`);
-  const lawn = h(`<section class="lawn" id="folders">
-    <h2 class="fold-title">แฟ้มของฉัน</h2>
-    <nav class="folds" aria-label="แฟ้มทั้งหมด"></nav>
-  </section>`);
+  const chips = [];
+  if(todayTasks.length) chips.push(`<a class="hm-chip" href="#planner">📝 <span>${LANG === 'en' ? `${left.length} of ${todayTasks.length} tasks left` : `เหลืออีก ${left.length} จาก ${todayTasks.length} งาน`}</span></a>`);
+  if(word) chips.push(`<a class="hm-chip" href="#vocab">🔤 <span>${T('คำศัพท์วันนี้')}</span> <b>${esc(word.word)}</b></a>`);
+  if(reading) chips.push(`<a class="hm-chip" href="#books">📖 <span>${T('กำลังอ่าน')}</span> <b>${esc(reading.title)}</b></a>`);
+  if(!chips.length) chips.push(`<a class="hm-chip" href="#diary">✏️ <span>เขียนบันทึกวันนี้</span></a>`);
 
-  const folds = $('.folds', lawn);
-  APPS.filter(a => a.id !== 'home').forEach(a => {
+  const page = h(`<div class="hm">
+    <div class="hm-deco" aria-hidden="true"></div>
+    <section class="hm-hero" aria-label="${T('หน้าแรก')}">
+      <div class="hm-card">
+        <span class="hm-tape" aria-hidden="true"></span>
+        <span class="hm-date">${dayLine(ymd())}</span>
+        <p class="hm-hi">${T(hello)}</p>
+        <h1 class="hm-name">${esc(name)}</h1>
+        <div class="hm-type" role="status" aria-live="polite">
+          <span class="mg-ic" aria-hidden="true">☁️</span>
+          <span class="mg-line"><span class="mg-text"></span><span class="mg-caret"></span></span>
+        </div>
+        <div class="hm-chips">
+          <button class="hm-chip md-weather" title="เปลี่ยนโหมดสภาพอากาศ"><span class="wi">☁️</span><span class="wt">กำลังดูสภาพอากาศ…</span><span class="wm"></span></button>
+          ${chips.join('')}
+        </div>
+      </div>
+      <figure class="hm-window">
+        <span class="hm-tape l" aria-hidden="true"></span><span class="hm-tape r" aria-hidden="true"></span>
+        <div class="meadow">
+          ${seaScene()}
+          <div class="md-tint"></div>
+          <canvas class="md-rain" aria-hidden="true"></canvas>
+          <div class="md-flash"></div>
+        </div>
+        <figcaption>หน้าต่างวันนี้</figcaption>
+      </figure>
+    </section>
+    <section class="hm-board" id="folders">
+      <div class="hm-cols">
+        <div>
+          <h2 class="hm-title">แฟ้มของฉัน</h2>
+          <nav class="folds" aria-label="แฟ้มทั้งหมด"></nav>
+        </div>
+        <div class="hm-arcade">
+          <h2 class="hm-title">ตู้คีบตุ๊กตา</h2>
+        </div>
+      </div>
+    </section>
+  </div>`);
+  const hero = $('.meadow', page);
+
+  const deco = $('.hm-deco', page);
+  HM_DECO.forEach(([k, x, y, s, r, d, cls]) => deco.append(h(`<span class="hm-stk ${cls || ''}" style="left:${x};top:${y};--s:${s}px;--r:${r}deg;--d:${d}s">${HM_STK[k]}</span>`)));
+
+  const folds = $('.folds', page);
+  APPS.filter(a => a.id !== 'home' && a.id !== 'game').forEach(a => {
     const f = h(`<a class="fold" href="#${a.id}" aria-label="${a.name}" title="${a.name}" style="--pat:${FOLDER_PAT[a.id]};--tabc:${FOLDER_TAB[a.id]};--fic:${FOLDER_ICON[a.id]}">
       <span class="fold-back"></span>
       <span class="fold-paper"></span><span class="fold-paper two"></span>
@@ -87,14 +134,12 @@ VIEWS.home = async el => {
     });
     folds.append(f);
   });
-  el.append(hero, lawn);
+  $('.hm-arcade', page).append(clawMachine({compact:true}));
+  el.append(page);
 
-  const toFolders = () => lawn.scrollIntoView({behavior: REDUCED ? 'auto' : 'smooth', block:'start'});
-  $('.mg-go', hero).onclick = toFolders; $('.md-scroll', hero).onclick = toFolders;
-
-  /* greeting messages typed into the glass bar */
+  /* greeting messages typed into the card */
   const msgs = [`${T(hello)} ${name}`];
-  const typer = typeLoop($('.mg-text', hero), msgs);
+  typeLoop($('.mg-text', page), msgs);
 
   /* weather */
   let wx = null;
@@ -104,10 +149,11 @@ VIEWS.home = async el => {
     if(mode === 'sun'){ kind = 'clear'; day = true; }
     if(mode === 'rain'){ kind = 'rain'; }
     hero.dataset.wx = kind; hero.dataset.day = day ? '1' : '0';
-    $('.md-weather .wi', hero).textContent = day || kind !== 'clear' ? Weather.icon(kind) : '🌙';
-    $('.md-weather .wt', hero).textContent = (wx && mode === 'auto' ? `${wx.temp}° ` : '') + T(Weather.label(kind));
-    $('.md-weather .wm', hero).textContent = T(({auto:'อัตโนมัติ', sun:'โหมดแดดดี', rain:'โหมดฝนตก'})[mode]);
-    $('.mg-ic', hero).textContent = day || kind !== 'clear' ? Weather.icon(kind) : '🌙';
+    const icon = day || kind !== 'clear' ? Weather.icon(kind) : '🌙';
+    $('.md-weather .wi', page).textContent = icon;
+    $('.md-weather .wt', page).textContent = (wx && mode === 'auto' ? `${wx.temp}° ` : '') + T(Weather.label(kind));
+    $('.md-weather .wm', page).textContent = T(({auto:'อัตโนมัติ', sun:'โหมดแดดดี', rain:'โหมดฝนตก'})[mode]);
+    $('.mg-ic', page).textContent = icon;
     Rain.set($('.md-rain', hero), kind === 'rain' || kind === 'storm', kind === 'storm', $('.md-flash', hero));
     // messages
     msgs.length = 0;
@@ -122,7 +168,7 @@ VIEWS.home = async el => {
   };
   requestAnimationFrame(() => requestAnimationFrame(applyWeather));   // after the page is on screen, so the rain canvas can size itself
   applyWeather();
-  $('.md-weather', hero).onclick = async () => {
+  $('.md-weather', page).onclick = async () => {
     const order = ['auto', 'sun', 'rain'];
     homeWeatherMode = order[(order.indexOf(weatherMode()) + 1) % 3];
     META.weatherMode = homeWeatherMode; applyWeather();
@@ -130,9 +176,11 @@ VIEWS.home = async el => {
     try{ await Store.setMeta(META); }catch(e){}
   };
   Weather.current().then(d => { wx = d; if(hero.isConnected) applyWeather(); }).catch(() => {
-    if(hero.isConnected) $('.md-weather .wt', hero).textContent = T('ดูสภาพอากาศไม่ได้');
+    if(hero.isConnected) $('.md-weather .wt', page).textContent = T('ดูสภาพอากาศไม่ได้');
   });
 };
+
+Object.assign(DICT, {'หน้าต่างวันนี้':'Today’s window', 'เขียนบันทึกวันนี้':'Write today’s entry', 'เปลี่ยนโหมดสภาพอากาศ':'Change weather mode'});
 
 /* typewriter that understands Thai combining marks */
 function typeLoop(el, msgs){
