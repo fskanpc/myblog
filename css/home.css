@@ -90,14 +90,10 @@ body[data-route="home"] main{max-width:1240px}
 
 /* weather report: an iOS-style liquid-glass weather widget */
 .wx-widget{position:absolute;right:clamp(14px,2.2vw,26px);top:clamp(14px,2.2vw,26px);z-index:5;width:clamp(158px,15vw,178px);aspect-ratio:1;display:flex;flex-direction:column;align-items:flex-start;padding:14px 15px 12px;border-radius:30px;text-align:left;color:#fff;
-  font-family:-apple-system,"SF Pro Display","IBM Plex Sans Thai Looped",system-ui,sans-serif;text-shadow:0 1px 6px rgba(20,40,80,.28);
-  --wxt:linear-gradient(180deg,rgba(64,138,222,.62),rgba(118,176,238,.42));
-  background:linear-gradient(160deg,rgba(255,255,255,.3),rgba(255,255,255,.04) 55%,rgba(255,255,255,.14)),var(--wxt);-webkit-backdrop-filter:blur(22px) saturate(180%) brightness(1.04);backdrop-filter:blur(22px) saturate(180%) brightness(1.04);
+  font-family:-apple-system,"SF Pro Display","IBM Plex Sans Thai Looped",system-ui,sans-serif;text-shadow:0 1px 3px rgba(20,40,80,.5),0 2px 12px rgba(20,40,80,.35);
+  background:linear-gradient(160deg,rgba(255,255,255,.16),rgba(255,255,255,.02) 55%,rgba(255,255,255,.08));-webkit-backdrop-filter:blur(9px) saturate(160%);backdrop-filter:blur(9px) saturate(160%);
   box-shadow:0 18px 40px -18px rgba(30,40,90,.55),inset 0 1px 1px rgba(255,255,255,.75),inset 0 -1px 1px rgba(255,255,255,.25),inset 0 0 0 1px rgba(255,255,255,.28);transition:transform .35s cubic-bezier(.2,1.4,.4,1)}
 .wx-widget::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.2px;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.1) 38%,rgba(255,255,255,0) 60%,rgba(255,255,255,.6));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
-.wx-widget::after{content:"";position:absolute;left:10%;right:30%;top:5px;height:36%;border-radius:24px 24px 60% 60%;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0));pointer-events:none}
-.wx-widget:hover{transform:scale(1.035)}
-.wx-widget:active{transform:scale(.97)}
 .wx-top{display:flex;align-items:center;gap:4px;max-width:100%;font-size:14px;font-weight:600;letter-spacing:-.01em}
 .wx-place{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wx-top svg{width:10px;height:10px;flex:none}
@@ -105,15 +101,18 @@ body[data-route="home"] main{max-width:1240px}
 .wx-bottom{display:flex;flex-direction:column;gap:0;margin-top:auto;font-size:13px;font-weight:600;line-height:1.3}
 .wx-bottom .wi{font-size:17px;line-height:1.1;text-shadow:none}
 .wx-hl{font-size:12.5px;font-weight:500;opacity:.92}
-.wx-widget .wm{position:absolute;right:0;top:calc(100% + 8px);padding:3px 10px;border-radius:999px;white-space:nowrap;background:rgba(255,255,255,.3);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.45);font-size:11px;font-weight:600;text-shadow:0 1px 3px rgba(20,40,80,.35)}
-/* tint follows the weather, like the iOS Weather widget */
-.meadow[data-wx="cloudy"] .wx-widget,.meadow[data-wx="fog"] .wx-widget{--wxt:linear-gradient(180deg,rgba(104,120,148,.6),rgba(140,154,178,.42))}
-.meadow[data-wx="rain"] .wx-widget,.meadow[data-wx="storm"] .wx-widget{--wxt:linear-gradient(180deg,rgba(62,78,110,.66),rgba(96,112,142,.46))}
-.meadow[data-day="0"] .wx-widget{--wxt:linear-gradient(180deg,rgba(28,34,88,.66),rgba(62,60,120,.46))}
+/* mode switcher: an iOS-style glass segmented control, bottom centre of the scene */
+.wx-modes{position:absolute;left:50%;bottom:clamp(12px,2vw,20px);transform:translateX(-50%);z-index:5;display:flex;gap:2px;padding:4px;border-radius:999px;
+  background:rgba(255,255,255,.42);-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);
+  box-shadow:0 10px 26px -14px rgba(30,40,90,.6),inset 0 1px 1px rgba(255,255,255,.7),inset 0 0 0 1px rgba(255,255,255,.35)}
+.wx-modes button{padding:6px 14px;border-radius:999px;color:#3A2E5A;font-size:13px;font-weight:600;white-space:nowrap;transition:background .25s,color .25s,box-shadow .25s}
+.wx-modes button:hover{background:rgba(255,255,255,.4)}
+.wx-modes button.on{background:#fff;color:#D9507F;box-shadow:0 2px 8px -2px rgba(30,40,90,.35)}
 
 @media (max-width:860px){
   .hm-scene{height:auto;aspect-ratio:4/3.3;border-radius:28px;border-width:5px}
   .wx-widget{width:138px;padding:11px 12px 10px;border-radius:26px}
+  .wx-modes button{padding:5px 9px;font-size:11.5px}
   .wx-temp{font-size:36px}.wx-top{font-size:12.5px}.wx-bottom{font-size:12px}.wx-hl{font-size:11px}
 }
 

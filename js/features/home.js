@@ -97,13 +97,15 @@ VIEWS.home = async el => {
         <div class="md-tint"></div>
         <canvas class="md-rain" aria-hidden="true"></canvas>
         <div class="md-flash"></div>
-        <button class="wx-widget md-weather" title="เปลี่ยนโหมดสภาพอากาศ">
+        <div class="wx-widget md-weather" role="status" aria-live="polite">
           <span class="wx-top"><span class="wx-place">สภาพอากาศวันนี้</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M11 1L1 5.2l4.3 1.5L6.8 11z" fill="currentColor"/></svg></span>
           <span class="wx-temp">--°</span>
           <span class="wx-bottom"><span class="wi">☁️</span><span class="wt">กำลังดูสภาพอากาศ…</span></span>
           <span class="wx-hl"></span>
-          <span class="wm"></span>
-        </button>
+        </div>
+        <div class="wx-modes" role="radiogroup" aria-label="โหมดสภาพอากาศ">
+          <button data-m="auto" role="radio">อัตโนมัติ</button><button data-m="sun" role="radio">☀️ แดด</button><button data-m="rain" role="radio">🌧️ ฝน</button><button data-m="night" role="radio">🌙 กลางคืน</button>
+        </div>
       </div>
     </section>
     <section class="hm-board" id="folders">
@@ -163,7 +165,7 @@ VIEWS.home = async el => {
     $('.md-weather .wx-temp', page).textContent = wx ? `${wx.temp}°` : '--°';
     $('.md-weather .wx-place', page).textContent = wx && wx.place ? wx.place : T('สภาพอากาศวันนี้');
     $('.md-weather .wx-hl', page).textContent = wx && wx.hi != null ? `${LANG === 'en' ? 'H' : 'สูงสุด'}:${wx.hi}° ${LANG === 'en' ? 'L' : 'ต่ำสุด'}:${wx.lo}°` : '';
-    $('.md-weather .wm', page).textContent = T(({auto:'อัตโนมัติ', sun:'โหมดแดดดี', rain:'โหมดฝนตก', night:'โหมดกลางคืน'})[mode]);
+    $$('.wx-modes button', page).forEach(b => { const on = b.dataset.m === mode; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
     $('.mg-ic', page).textContent = icon;
     Rain.set($('.md-rain', hero), kind === 'rain' || kind === 'storm', kind === 'storm', $('.md-flash', hero));
     // messages
@@ -179,19 +181,18 @@ VIEWS.home = async el => {
   };
   requestAnimationFrame(() => requestAnimationFrame(applyWeather));   // after the page is on screen, so the rain canvas can size itself
   applyWeather();
-  $('.md-weather', page).onclick = async () => {
-    const order = ['auto', 'sun', 'rain', 'night'];
-    homeWeatherMode = order[(order.indexOf(weatherMode()) + 1) % order.length];
+  $$('.wx-modes button', page).forEach(b => b.onclick = async () => {
+    if(b.dataset.m === weatherMode()) return;
+    homeWeatherMode = b.dataset.m;
     META.weatherMode = homeWeatherMode; applyWeather();
-    toast(T(({auto:'สภาพอากาศตามจริง', sun:'เปลี่ยนเป็นวันแดดดี', rain:'เปลี่ยนเป็นวันฝนตก', night:'เปลี่ยนเป็นกลางคืน'})[homeWeatherMode]));
     try{ await Store.setMeta(META); }catch(e){}
-  };
+  });
   Weather.current().then(d => { wx = d; if(hero.isConnected) applyWeather(); }).catch(() => {
     if(hero.isConnected) $('.md-weather .wt', page).textContent = T('ดูสภาพอากาศไม่ได้');
   });
 };
 
-Object.assign(DICT, {'หน้าต่างวันนี้':'Today’s window', 'เขียนบันทึกวันนี้':'Write today’s entry', 'เปลี่ยนโหมดสภาพอากาศ':'Change weather mode', 'สภาพอากาศวันนี้':'Today’s weather', 'โหมดกลางคืน':'Night mode', 'เปลี่ยนเป็นกลางคืน':'Switched to night'});
+Object.assign(DICT, {'หน้าต่างวันนี้':'Today’s window', 'เขียนบันทึกวันนี้':'Write today’s entry', 'เปลี่ยนโหมดสภาพอากาศ':'Change weather mode', 'สภาพอากาศวันนี้':'Today’s weather', 'โหมดสภาพอากาศ':'Weather mode', 'แดด':'Sunny', 'ฝน':'Rain', 'กลางคืน':'Night', 'โหมดกลางคืน':'Night mode', 'เปลี่ยนเป็นกลางคืน':'Switched to night'});
 
 /* typewriter that understands Thai combining marks */
 function typeLoop(el, msgs){
