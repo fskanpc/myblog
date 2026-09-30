@@ -54,8 +54,12 @@ body[data-route="home"] main{max-width:1240px}
 .hm-title small{font-family:var(--body);font-size:14px;font-weight:500;color:var(--ink-soft)}
 .hm-title::after{content:"";flex:none;width:54px;height:12px;background:url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 12"%3E%3Cpath d="M2 7c6-6 10 4 16-1s10-4 16 1 10 4 18-2" fill="none" stroke="%23FFB3CB" stroke-width="3" stroke-linecap="round"/%3E%3C/svg%3E') no-repeat center/contain}
 
-/* ---------- hero: train banner with the greeting card floating on it ---------- */
-.hm-hero{position:relative;margin-bottom:56px}
+/* ---------- hero: greeting card on top, train banner below ---------- */
+.hm-hero{position:relative;display:grid;gap:26px;margin-bottom:56px}
+.hm-hero > .hm-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);column-gap:clamp(20px,3vw,44px);align-items:center;padding:clamp(24px,2.8vw,34px) clamp(24px,3.4vw,44px)}
+.hm-greet .hm-hi{margin-top:14px}
+.hm-today .hm-type{margin:0 0 14px}
+@media (max-width:760px){.hm-hero > .hm-card{grid-template-columns:1fr}.hm-today{margin-top:16px}}
 .hm-card{position:relative;padding:clamp(26px,3.4vw,42px);border-radius:34px;background:var(--hm-card);border:2px solid var(--hm-edge);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:var(--hm-cast),inset 0 0 0 7px var(--hm-card),inset 0 0 0 9px var(--hm-line)}
 .hm-tape{position:absolute;width:96px;height:26px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.45) 0 6px,transparent 6px 12px),var(--tc,#FFC8DA);opacity:.92;box-shadow:0 2px 4px rgba(120,60,90,.12);z-index:2}
 .hm-card .hm-tape{left:50%;top:-13px;transform:translateX(-50%) rotate(-3deg)}
@@ -79,31 +83,38 @@ body[data-route="home"] main{max-width:1240px}
 .hm-chip .wm{font-size:12px;color:var(--ink-soft);padding-left:7px;border-left:1px solid var(--hm-line)}
 
 /* the train scene: a rounded, tape-framed banner */
-.hm-scene{position:relative;height:clamp(460px,44vw,560px);border-radius:36px;overflow:hidden;isolation:isolate;background:#CDE8F7;border:6px solid #FFFDF9;box-shadow:var(--hm-cast)}
+.hm-scene{position:relative;height:clamp(380px,38vw,500px);border-radius:36px;overflow:hidden;isolation:isolate;background:#CDE8F7;border:6px solid #FFFDF9;box-shadow:var(--hm-cast)}
 :root[data-theme="dark"] .hm-scene{border-color:#3A3163}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hm-scene{border-color:#3A3163}}
-.hm-hero > .hm-card{position:absolute;left:clamp(20px,3vw,40px);top:50%;transform:translateY(-50%);width:min(420px,38%);z-index:4;padding:clamp(22px,2.6vw,32px)}
-.hm-hero .hm-name{font-size:clamp(34px,4.4vw,54px);overflow-wrap:normal;word-break:keep-all}
-.hm-hero .hm-type{margin:12px 0 16px}
 .train-scene{position:absolute;inset:0;width:100%;height:100%;display:block}
 
-/* weather report: a little station sign hanging in the scene */
-.hm-station{position:absolute;right:clamp(16px,2.4vw,30px);top:26px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 18px 9px;border-radius:16px;background:#FFFDF6;color:#5B3A4A;border:2px solid #F6C6D6;box-shadow:0 10px 20px -12px rgba(90,40,70,.55),inset 0 -3px 0 rgba(240,170,195,.35);font-family:var(--display);transform-origin:50% -24px;animation:signSway 5s ease-in-out infinite alternate;transition:transform .2s}
-.hm-station::before,.hm-station::after{content:"";position:absolute;top:-28px;width:2px;height:28px;background:#C99AAE}
-.hm-station::before{left:26%}.hm-station::after{right:26%}
-.hm-station:hover{animation-play-state:paused;transform:translateY(-2px) rotate(-1deg)}
-.st-cap{font-size:11px;font-weight:600;letter-spacing:.06em;color:#D9507F}
-.st-row{display:flex;align-items:center;gap:6px;font-size:17px;font-weight:700;white-space:nowrap}
-.st-row .wi{font-size:22px}
-.hm-station .wm{font-family:var(--body);font-size:11.5px;font-weight:500;color:#9A7A88}
-@keyframes signSway{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+/* weather report: an iOS-style liquid-glass weather widget */
+.wx-widget{position:absolute;right:clamp(14px,2.2vw,26px);top:clamp(14px,2.2vw,26px);z-index:5;width:clamp(158px,15vw,178px);aspect-ratio:1;display:flex;flex-direction:column;align-items:flex-start;padding:14px 15px 12px;border-radius:30px;text-align:left;color:#fff;
+  font-family:-apple-system,"SF Pro Display","IBM Plex Sans Thai Looped",system-ui,sans-serif;text-shadow:0 1px 6px rgba(20,40,80,.28);
+  --wxt:linear-gradient(180deg,rgba(64,138,222,.62),rgba(118,176,238,.42));
+  background:linear-gradient(160deg,rgba(255,255,255,.3),rgba(255,255,255,.04) 55%,rgba(255,255,255,.14)),var(--wxt);-webkit-backdrop-filter:blur(22px) saturate(180%) brightness(1.04);backdrop-filter:blur(22px) saturate(180%) brightness(1.04);
+  box-shadow:0 18px 40px -18px rgba(30,40,90,.55),inset 0 1px 1px rgba(255,255,255,.75),inset 0 -1px 1px rgba(255,255,255,.25),inset 0 0 0 1px rgba(255,255,255,.28);transition:transform .35s cubic-bezier(.2,1.4,.4,1)}
+.wx-widget::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.2px;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.1) 38%,rgba(255,255,255,0) 60%,rgba(255,255,255,.6));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.wx-widget::after{content:"";position:absolute;left:10%;right:30%;top:5px;height:36%;border-radius:24px 24px 60% 60%;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0));pointer-events:none}
+.wx-widget:hover{transform:scale(1.035)}
+.wx-widget:active{transform:scale(.97)}
+.wx-top{display:flex;align-items:center;gap:4px;max-width:100%;font-size:14px;font-weight:600;letter-spacing:-.01em}
+.wx-place{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wx-top svg{width:10px;height:10px;flex:none}
+.wx-temp{font-size:clamp(40px,4vw,48px);font-weight:300;line-height:1.05;letter-spacing:-.03em;margin-top:2px}
+.wx-bottom{display:flex;flex-direction:column;gap:0;margin-top:auto;font-size:13px;font-weight:600;line-height:1.3}
+.wx-bottom .wi{font-size:17px;line-height:1.1;text-shadow:none}
+.wx-hl{font-size:12.5px;font-weight:500;opacity:.92}
+.wx-widget .wm{position:absolute;right:0;top:calc(100% + 8px);padding:3px 10px;border-radius:999px;white-space:nowrap;background:rgba(255,255,255,.3);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.45);font-size:11px;font-weight:600;text-shadow:0 1px 3px rgba(20,40,80,.35)}
+/* tint follows the weather, like the iOS Weather widget */
+.meadow[data-wx="cloudy"] .wx-widget,.meadow[data-wx="fog"] .wx-widget{--wxt:linear-gradient(180deg,rgba(104,120,148,.6),rgba(140,154,178,.42))}
+.meadow[data-wx="rain"] .wx-widget,.meadow[data-wx="storm"] .wx-widget{--wxt:linear-gradient(180deg,rgba(62,78,110,.66),rgba(96,112,142,.46))}
+.meadow[data-day="0"] .wx-widget{--wxt:linear-gradient(180deg,rgba(28,34,88,.66),rgba(62,60,120,.46))}
 
 @media (max-width:860px){
   .hm-scene{height:auto;aspect-ratio:4/3.3;border-radius:28px;border-width:5px}
-  .hm-hero > .hm-card{position:relative;left:auto;top:auto;transform:none;width:auto;margin:-46px 10px 0}
-  .train-scene .train{animation:rideFull 26s linear infinite}
-  .hm-station{top:14px;right:12px;padding:7px 12px 6px}
-  .st-row{font-size:14px}.st-row .wi{font-size:18px}
+  .wx-widget{width:138px;padding:11px 12px 10px;border-radius:26px}
+  .wx-temp{font-size:36px}.wx-top{font-size:12.5px}.wx-bottom{font-size:12px}.wx-hl{font-size:11px}
 }
 
 /* ---------- board: folders + claw machine ---------- */
@@ -145,17 +156,6 @@ body[data-route="home"] main{max-width:1240px}
 
 /* ---------- train scene: moods ---------- */
 .meadow{position:relative}
-.wn-bubbles{position:absolute;inset:0;pointer-events:none;transition:opacity 1.4s}
-/* no-sun days (cloudy / fog): soap bubbles drifting up and swaying */
-.wn-bubbles{overflow:hidden;opacity:0}
-.meadow[data-day="1"][data-wx="cloudy"] .wn-bubbles,.meadow[data-day="1"][data-wx="fog"] .wn-bubbles{opacity:1}
-.bub{position:absolute;top:0;height:100%;width:var(--sz);animation:bubUp var(--dur) linear var(--dl) infinite}
-.bub i{display:block;width:var(--sz);height:var(--sz);border-radius:50%;animation:bubSway var(--sd) ease-in-out infinite alternate;
-  background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.95) 0 7%,rgba(255,255,255,.18) 16%,transparent 34%),radial-gradient(circle at 50% 50%,rgba(255,255,255,.04) 0 56%,rgba(190,235,255,.35) 64%,rgba(255,190,235,.45) 69%,rgba(255,255,255,.75) 72%,transparent 74%);
-  box-shadow:inset -2px -3px 6px rgba(160,210,255,.25)}
-@keyframes bubUp{0%{transform:translateY(100%);opacity:0}8%{opacity:1}85%{opacity:.9}100%{transform:translateY(-12%);opacity:0}}
-@keyframes bubSway{from{transform:translateX(calc(var(--sw) * -1)) scale(.96)}to{transform:translateX(var(--sw)) scale(1.04)}}
-
 .train-scene .sky,.train-scene .stars,.train-scene .moon,.train-scene .shade,.train-scene .lights,.train-scene .cl g{transition:opacity 1.4s,fill 1.4s}
 .train-scene .sky-grey,.train-scene .sky-rain,.train-scene .sky-night,.train-scene .stars,.train-scene .moon,.train-scene .lights{opacity:0}
 .train-scene .cl g{fill:#FFFFFF;opacity:.95}
@@ -170,9 +170,8 @@ body[data-route="home"] main{max-width:1240px}
 .train-scene .poles line{stroke:#8E7D86;stroke-width:4;stroke-linecap:round}
 .train-scene .wire{fill:none;stroke:#6F6070;stroke-width:1.4;opacity:.7}
 /* the train */
-.train-scene .train{animation:ride 20s linear infinite}
-@keyframes ride{from{transform:translateX(230px)}to{transform:translateX(1520px)}}
-@keyframes rideFull{from{transform:translateX(-420px)}to{transform:translateX(1520px)}}
+.train-scene .train{animation:ride 26s linear infinite}
+@keyframes ride{from{transform:translateX(-420px)}to{transform:translateX(1520px)}}
 .train-scene .rock{animation:rock 0.9s ease-in-out infinite alternate}
 @keyframes rock{from{transform:translateY(0)}to{transform:translateY(-1.4px)}}
 .train-scene .body{fill:#EE5A71}.train-scene .roof{fill:#FFF3E6}.train-scene .stripe{fill:#FFF1D6}.train-scene .skirt{fill:#C9425A}
@@ -194,7 +193,7 @@ body[data-route="home"] main{max-width:1240px}
 .train-scene .sp{fill:#FFFBE6}
 @keyframes tw{50%{opacity:.2}}
 
-/* cloudy / fog: soft grey sky, greyer clouds, bubbles float up */
+/* cloudy / fog: soft grey sky, greyer clouds */
 .meadow[data-wx="cloudy"] .sky-grey,.meadow[data-wx="fog"] .sky-grey{opacity:1}
 .meadow[data-wx="cloudy"] .cl g,.meadow[data-wx="fog"] .cl g{fill:#F1F2F6}
 .meadow[data-wx="cloudy"] .shade{fill:#606A80;opacity:.12}

@@ -38,12 +38,13 @@ const Weather = (() => {
     cacheSet('bubble:pos', p, true); return p;
   }
   async function current(){
-    const c = cacheGet('bubble:wx', 20 * 60e3); if(c) return c;
+    const c = cacheGet('bubble:wx2', 20 * 60e3); if(c) return c;
     const p = await position();
-    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,weather_code,is_day&timezone=auto`);
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min&forecast_days=1&timezone=auto`);
     const j = await r.json(); const cur = j.current || {};
-    const d = {temp:Math.round(cur.temperature_2m), kind:kindOf(cur.weather_code ?? 0), day:cur.is_day !== 0, place:p.name || ''};
-    cacheSet('bubble:wx', d); return d;
+    const dly = j.daily || {}, hi = (dly.temperature_2m_max || [])[0], lo = (dly.temperature_2m_min || [])[0];
+    const d = {temp:Math.round(cur.temperature_2m), kind:kindOf(cur.weather_code ?? 0), day:cur.is_day !== 0, place:p.name || '', hi:hi == null ? null : Math.round(hi), lo:lo == null ? null : Math.round(lo)};
+    cacheSet('bubble:wx2', d); return d;
   }
   return {KINDS, current, label:k => (KINDS[k] || KINDS.clear).th, icon:k => (KINDS[k] || KINDS.clear).icon};
 })();

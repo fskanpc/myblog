@@ -1,5 +1,5 @@
 /* =========================================================
-   HOME: train banner with greeting card + weather sign, folders, claw machine
+   HOME: greeting card, train banner with a weather widget, folders, claw machine
    ========================================================= */
 const FOLDER_THEME = {
   diary:  {bg:'#FFDCE8', ink:'#E47AA3', tab:'#F8C3D6'},
@@ -50,7 +50,7 @@ const HM_STK = {
 };
 const HM_DECO = [
   ['star', '-1%', '2%', 54, -12, 6], ['bow', '44%', '-1%', 50, 8, 7, 'hide-sm'], ['sparkle', '97%', '4%', 36, 0, 5],
-  ['heart', '.5%', '46%', 40, -10, 6.5, 'hide-sm'], ['smile', '96%', '44%', 46, 12, 7], ['flower', '52%', '33.5%', 38, -6, 8, 'hide-sm'],
+  ['heart', '.5%', '46%', 40, -10, 6.5, 'hide-sm'], ['smile', '96%', '44%', 46, 12, 7],
   ['sparkle', '2%', '94%', 30, 0, 5.5, 'hide-sm'], ['star', '95%', '93%', 40, 14, 6.5], ['heart', '60%', '97%', 32, 10, 7, 'hide-sm']
 ];
 
@@ -75,30 +75,35 @@ VIEWS.home = async el => {
   const page = h(`<div class="hm">
     <div class="hm-deco" aria-hidden="true"></div>
     <section class="hm-hero" aria-label="${T('หน้าแรก')}">
+      <div class="hm-card">
+        <span class="hm-tape" aria-hidden="true"></span>
+        <div class="hm-greet">
+          <span class="hm-date">${dayLine(ymd())}</span>
+          <p class="hm-hi">${T(hello)}</p>
+          <h1 class="hm-name">${esc(name)}</h1>
+        </div>
+        <div class="hm-today">
+          <div class="hm-type" role="status" aria-live="polite">
+            <span class="mg-ic" aria-hidden="true">☁️</span>
+            <span class="mg-line"><span class="mg-text"></span><span class="mg-caret"></span></span>
+          </div>
+          <div class="hm-chips">
+            ${chips.join('')}
+          </div>
+        </div>
+      </div>
       <div class="hm-scene meadow">
         ${trainScene()}
-        <div class="wn-bubbles"></div>
         <div class="md-tint"></div>
         <canvas class="md-rain" aria-hidden="true"></canvas>
         <div class="md-flash"></div>
-        <button class="hm-station md-weather" title="เปลี่ยนโหมดสภาพอากาศ">
-          <span class="st-cap">สภาพอากาศวันนี้</span>
-          <span class="st-row"><span class="wi">☁️</span><span class="wt">กำลังดูสภาพอากาศ…</span></span>
+        <button class="wx-widget md-weather" title="เปลี่ยนโหมดสภาพอากาศ">
+          <span class="wx-top"><span class="wx-place">สภาพอากาศวันนี้</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M11 1L1 5.2l4.3 1.5L6.8 11z" fill="currentColor"/></svg></span>
+          <span class="wx-temp">--°</span>
+          <span class="wx-bottom"><span class="wi">☁️</span><span class="wt">กำลังดูสภาพอากาศ…</span></span>
+          <span class="wx-hl"></span>
           <span class="wm"></span>
         </button>
-      </div>
-      <div class="hm-card">
-        <span class="hm-tape" aria-hidden="true"></span>
-        <span class="hm-date">${dayLine(ymd())}</span>
-        <p class="hm-hi">${T(hello)}</p>
-        <h1 class="hm-name">${esc(name)}</h1>
-        <div class="hm-type" role="status" aria-live="polite">
-          <span class="mg-ic" aria-hidden="true">☁️</span>
-          <span class="mg-line"><span class="mg-text"></span><span class="mg-caret"></span></span>
-        </div>
-        <div class="hm-chips">
-          ${chips.join('')}
-        </div>
       </div>
     </section>
     <section class="hm-board" id="folders">
@@ -114,13 +119,6 @@ VIEWS.home = async el => {
     </section>
   </div>`);
   const hero = $('.meadow', page);
-
-  /* soap bubbles that float up on cloudy days */
-  const bub = $('.wn-bubbles', hero);
-  for(let i = 0; i < 22; i++){
-    const size = 10 + Math.random() * 34, dur = 10 + Math.random() * 12;
-    bub.append(h(`<span class="bub" style="left:${(Math.random() * 96).toFixed(1)}%;--sz:${size.toFixed(0)}px;--dur:${dur.toFixed(1)}s;--dl:${(-Math.random() * dur).toFixed(1)}s;--sw:${(8 + Math.random() * 22).toFixed(0)}px;--sd:${(2.5 + Math.random() * 3).toFixed(1)}s"><i></i></span>`));
-  }
 
   const deco = $('.hm-deco', page);
   HM_DECO.forEach(([k, x, y, s, r, d, cls]) => deco.append(h(`<span class="hm-stk ${cls || ''}" style="left:${x};top:${y};--s:${s}px;--r:${r}deg;--d:${d}s">${HM_STK[k]}</span>`)));
@@ -160,7 +158,11 @@ VIEWS.home = async el => {
     hero.dataset.wx = kind; hero.dataset.day = day ? '1' : '0';
     const icon = day || kind !== 'clear' ? Weather.icon(kind) : '🌙';
     $('.md-weather .wi', page).textContent = icon;
-    $('.md-weather .wt', page).textContent = (wx && mode === 'auto' ? `${wx.temp}° ` : '') + T(Weather.label(kind));
+    // temperature and place stay real; the preview modes only change the sky
+    $('.md-weather .wt', page).textContent = T(Weather.label(kind));
+    $('.md-weather .wx-temp', page).textContent = wx ? `${wx.temp}°` : '--°';
+    $('.md-weather .wx-place', page).textContent = wx && wx.place ? wx.place : T('สภาพอากาศวันนี้');
+    $('.md-weather .wx-hl', page).textContent = wx && wx.hi != null ? `${LANG === 'en' ? 'H' : 'สูงสุด'}:${wx.hi}° ${LANG === 'en' ? 'L' : 'ต่ำสุด'}:${wx.lo}°` : '';
     $('.md-weather .wm', page).textContent = T(({auto:'อัตโนมัติ', sun:'โหมดแดดดี', rain:'โหมดฝนตก', night:'โหมดกลางคืน'})[mode]);
     $('.mg-ic', page).textContent = icon;
     Rain.set($('.md-rain', hero), kind === 'rain' || kind === 'storm', kind === 'storm', $('.md-flash', hero));
@@ -189,7 +191,7 @@ VIEWS.home = async el => {
   });
 };
 
-Object.assign(DICT, {'หน้าต่างวันนี้':'Today’s window', 'เขียนบันทึกวันนี้':'Write today’s entry', 'เปลี่ยนโหมดสภาพอากาศ':'Change weather mode', 'โหมดกลางคืน':'Night mode', 'เปลี่ยนเป็นกลางคืน':'Switched to night'});
+Object.assign(DICT, {'หน้าต่างวันนี้':'Today’s window', 'เขียนบันทึกวันนี้':'Write today’s entry', 'เปลี่ยนโหมดสภาพอากาศ':'Change weather mode', 'สภาพอากาศวันนี้':'Today’s weather', 'โหมดกลางคืน':'Night mode', 'เปลี่ยนเป็นกลางคืน':'Switched to night'});
 
 /* typewriter that understands Thai combining marks */
 function typeLoop(el, msgs){
