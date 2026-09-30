@@ -55,7 +55,7 @@ body[data-route="home"] main{max-width:1240px}
 .hm-title::after{content:"";flex:none;width:54px;height:12px;background:url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 12"%3E%3Cpath d="M2 7c6-6 10 4 16-1s10-4 16 1 10 4 18-2" fill="none" stroke="%23FFB3CB" stroke-width="3" stroke-linecap="round"/%3E%3C/svg%3E') no-repeat center/contain}
 
 /* ---------- hero: greeting card + live window ---------- */
-.hm-hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:clamp(20px,3vw,40px);align-items:center;margin-bottom:56px}
+.hm-hero{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(20px,3vw,40px);align-items:center;margin-bottom:56px}
 .hm-card{position:relative;padding:clamp(26px,3.4vw,42px);border-radius:34px;background:var(--hm-card);border:2px solid var(--hm-edge);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:var(--hm-cast),inset 0 0 0 7px var(--hm-card),inset 0 0 0 9px var(--hm-line)}
 .hm-tape{position:absolute;width:96px;height:26px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.45) 0 6px,transparent 6px 12px),var(--tc,#FFC8DA);opacity:.92;box-shadow:0 2px 4px rgba(120,60,90,.12);z-index:2}
 .hm-card .hm-tape{left:50%;top:-13px;transform:translateX(-50%) rotate(-3deg)}
@@ -86,8 +86,8 @@ body[data-route="home"] main{max-width:1240px}
 .hm-window .hm-tape{top:-12px;--tc:#CFE3FF}
 .hm-window .hm-tape.l{left:-18px;transform:rotate(-32deg)}
 .hm-window .hm-tape.r{right:-18px;left:auto;transform:rotate(30deg);--tc:#FFE59A}
-.meadow{position:relative;aspect-ratio:4/3.1;border-radius:14px;overflow:hidden;isolation:isolate}
-.hm-window figcaption{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:var(--display);font-weight:600;font-size:15px;color:var(--hm-brown)}
+.meadow{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;isolation:isolate}
+.hm-window figcaption{position:absolute;pointer-events:none;left:0;right:0;bottom:10px;text-align:center;font-family:var(--display);font-weight:600;font-size:15px;color:var(--hm-brown)}
 
 /* ---------- board: folders + claw machine ---------- */
 .hm-board{position:relative;padding:44px clamp(18px,3vw,40px) 50px;border-radius:40px;background:
@@ -102,7 +102,7 @@ body[data-route="home"] main{max-width:1240px}
 .hm-arcade{position:relative}
 .hm-arcade .hm-title::before{content:"NEW";order:2;padding:2px 9px;border-radius:999px;background:#FF7FA8;color:#fff;font-family:var(--body);font-size:11px;letter-spacing:.08em}
 @media (max-width:1020px){.hm-cols{grid-template-columns:1fr}.hm-arcade{max-width:430px;width:100%;margin:10px auto 0}}
-@media (max-width:860px){.hm-hero{grid-template-columns:1fr;margin-bottom:44px}.hm-window{max-width:520px;width:100%;margin:0 auto}}
+@media (max-width:860px){.hm-hero{grid-template-columns:1fr;margin-bottom:44px}.hm-window{max-width:420px;width:100%;margin:0 auto}}
 @media (max-width:560px){.hm-board{padding:36px 14px 40px;border-radius:30px}.hm-board .folds{grid-template-columns:repeat(2,1fr);gap:50px 14px}.hm-card{padding:26px 20px}}
 
 /* ---------- folders ---------- */
@@ -126,57 +126,39 @@ body[data-route="home"] main{max-width:1240px}
 .md-flash.bolt{animation:bolt 1.1s ease-out}
 @keyframes bolt{0%,100%{opacity:0}6%{opacity:.75}12%{opacity:.1}18%{opacity:.55}40%{opacity:0}}
 
-/* ================= seaside scene ================= */
-.meadow{background:#A9DDF6}
-.sea-scene{position:absolute;inset:0;width:100%;height:100%;display:block}
-.sea-scene .sky-night,.sea-scene .sea-night,.sea-scene .stars,.sea-scene .moon,.sea-scene .moonpath{opacity:0;transition:opacity 1.6s}
-.sea-scene .sun,.sea-scene .birds,.sea-scene .glitter,.sea-scene .sky-day,.sea-scene .sea-day{transition:opacity 1.6s}
-.meadow[data-day="0"] .sky-night,.meadow[data-day="0"] .sea-night,.meadow[data-day="0"] .stars,.meadow[data-day="0"] .moon,.meadow[data-day="0"] .moonpath{opacity:1}
-.meadow[data-day="0"] .sun,.meadow[data-day="0"] .birds,.meadow[data-day="0"] .glitter{opacity:0}
-.meadow[data-day="0"] .clouds{opacity:.35}
-.meadow[data-day="0"] .walker,.meadow[data-day="0"] .palms,.meadow[data-day="0"] .boat,.meadow[data-day="0"] .dolphin{filter:brightness(.62) saturate(.85)}
-.meadow[data-day="0"] .md-tint{background:linear-gradient(180deg,transparent 0 56%,rgba(12,20,60,.38) 70%,rgba(10,16,48,.5))!important}
-.sea-scene .tw{animation:tw 3s ease-in-out infinite}
-@keyframes tw{50%{opacity:.25}}
-.sea-scene .rays{transform-box:fill-box;transform-origin:center;animation:spin 80s linear infinite}
-.sea-scene .island{fill:#8CC3D3;transition:fill 1.6s}
-.meadow[data-day="0"] .island{fill:#2A3470}
-.sea-scene .cl{animation:clDrift linear infinite}
-@keyframes clDrift{from{transform:translateX(1950px)}to{transform:translateX(-350px)}}
-.sea-scene .flock{animation:flock 70s linear infinite}
-@keyframes flock{from{transform:translate(-160px,40px)}to{transform:translate(1760px,-30px)}}
-.sea-scene .wing{transform-box:fill-box;transform-origin:center;animation:flap .45s ease-in-out infinite alternate}
-@keyframes flap{to{transform:scaleY(.35)}}
-.sea-scene .wv{animation:wv 8s ease-in-out infinite alternate}
-@keyframes wv{to{transform:translateX(-70px)}}
-.sea-scene .gl{opacity:.85;animation:gl 2.6s ease-in-out infinite}
-@keyframes gl{50%{opacity:.15}}
-.sea-scene .boat-move{animation:boat 160s linear infinite}
-@keyframes boat{from{transform:translate(-120px,592px)}to{transform:translate(1720px,592px)}}
-.sea-scene .boat-rock{transform-box:fill-box;transform-origin:50% 100%;animation:rock 3.4s ease-in-out infinite alternate}
-@keyframes rock{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
-.sea-scene .foam{animation:foam 5.5s ease-in-out infinite}
-@keyframes foam{0%,100%{transform:translateY(0);opacity:.95}50%{transform:translateY(9px);opacity:.45}}
-.sea-scene .walker{animation:walk 46s linear infinite}
-@keyframes walk{
-  0%{transform:translate(520px,0) scale(1,1)}
-  47%{transform:translate(980px,0) scale(1,1)}
-  50%{transform:translate(1116px,0) scale(-1,1)}
-  97%{transform:translate(656px,0) scale(-1,1)}
-  100%{transform:translate(520px,0) scale(1,1)}}
-.sea-scene .leg,.sea-scene .arm{transform-box:fill-box;transform-origin:50% 0;animation:stride .55s ease-in-out infinite alternate}
-.sea-scene .l2,.sea-scene .a1{animation-direction:alternate-reverse}
-@keyframes stride{from{transform:rotate(16deg)}to{transform:rotate(-16deg)}}
-.sea-scene .bob{animation:bob2 .55s ease-in-out infinite alternate}
-.sea-scene .dbob{animation:bob2 .3s ease-in-out infinite alternate}
-@keyframes bob2{to{transform:translateY(-3px)}}
-.sea-scene .dleg{transform-box:fill-box;transform-origin:50% 0;animation:stride .3s ease-in-out infinite alternate}
-.sea-scene .d2,.sea-scene .d3{animation-direction:alternate-reverse}
-.sea-scene .tail{transform-box:fill-box;transform-origin:100% 100%;animation:wag .32s ease-in-out infinite alternate}
-@keyframes wag{from{transform:rotate(-14deg)}to{transform:rotate(16deg)}}
-.sea-scene .sway{animation:palm 6s ease-in-out infinite alternate}
-@keyframes palm{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
-.meadow[data-wx="rain"] .sun,.meadow[data-wx="storm"] .sun,.meadow[data-wx="rain"] .birds,.meadow[data-wx="storm"] .birds,.meadow[data-wx="rain"] .glitter,.meadow[data-wx="storm"] .glitter,.meadow[data-wx="rain"] .stars,.meadow[data-wx="storm"] .stars{opacity:0}
-.meadow[data-wx="rain"] .clouds,.meadow[data-wx="storm"] .clouds{filter:brightness(.78)}
-.meadow[data-wx="rain"] .cl,.meadow[data-wx="storm"] .cl{animation-duration:80s!important}
-.meadow[data-wx="cloudy"] .sun{opacity:.55}
+/* window photo with weather animations on top */
+.meadow{background:#9DB8C4}
+.wn-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter 1.4s}
+.wn-storm,.wn-night,.wn-bubbles{position:absolute;inset:0;pointer-events:none;transition:opacity 1.4s}
+
+/* sunny: soap bubbles drifting up and swaying */
+.wn-bubbles{overflow:hidden;opacity:0}
+.meadow[data-day="1"][data-wx="clear"] .wn-bubbles,.meadow[data-day="1"][data-wx="partly"] .wn-bubbles{opacity:1}
+.bub{position:absolute;top:0;height:100%;width:var(--sz);animation:bubUp var(--dur) linear var(--dl) infinite}
+.bub i{display:block;width:var(--sz);height:var(--sz);border-radius:50%;animation:bubSway var(--sd) ease-in-out infinite alternate;
+  background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.95) 0 7%,rgba(255,255,255,.18) 16%,transparent 34%),radial-gradient(circle at 50% 50%,rgba(255,255,255,.04) 0 56%,rgba(190,235,255,.35) 64%,rgba(255,190,235,.45) 69%,rgba(255,255,255,.75) 72%,transparent 74%);
+  box-shadow:inset -2px -3px 6px rgba(160,210,255,.25)}
+@keyframes bubUp{0%{transform:translateY(100%);opacity:0}8%{opacity:1}85%{opacity:.9}100%{transform:translateY(-12%);opacity:0}}
+@keyframes bubSway{from{transform:translateX(calc(var(--sw) * -1)) scale(.96)}to{transform:translateX(var(--sw)) scale(1.04)}}
+
+/* rain: clouds turn grey-blue, photo dims, rain canvas on top */
+.wn-storm{opacity:0;mix-blend-mode:multiply;background:linear-gradient(180deg,rgba(70,82,110,.9),rgba(88,100,130,.75) 32%,rgba(120,130,150,.35) 50%,transparent 66%)}
+.meadow[data-wx="rain"] .wn-storm,.meadow[data-wx="storm"] .wn-storm{opacity:1}
+.meadow[data-wx="storm"] .wn-storm{background:linear-gradient(180deg,rgba(45,52,78,.95),rgba(60,68,98,.85) 34%,rgba(100,108,130,.4) 52%,transparent 68%)}
+.meadow[data-wx="rain"] .wn-photo,.meadow[data-wx="storm"] .wn-photo{filter:saturate(.72) brightness(.82)}
+.meadow[data-wx="rain"] .md-tint,.meadow[data-wx="storm"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(40,55,80,.25),rgba(30,45,60,.15))}
+.meadow[data-wx="cloudy"] .wn-photo,.meadow[data-wx="fog"] .wn-photo{filter:saturate(.8) brightness(.96)}
+.meadow[data-wx="fog"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(235,240,245,.25),rgba(235,240,245,.5))}
+
+/* night: dark blue photo, glowing moon, moonlight wash and stars */
+.meadow[data-day="0"] .wn-photo{filter:brightness(.45) saturate(.7) hue-rotate(14deg)}
+.meadow[data-day="0"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(14,20,70,.5),rgba(10,18,50,.3))}
+.wn-night{opacity:0}
+.meadow[data-day="0"] .wn-night{opacity:1}
+.meadow[data-day="0"][data-wx="rain"] .wn-night,.meadow[data-day="0"][data-wx="storm"] .wn-night{opacity:0}
+.wn-moon{position:absolute;right:16%;top:9%;width:15%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 38% 36%,#FFFDF2,#FFF4C8 55%,#F2E1A6);box-shadow:0 0 18px 6px rgba(255,246,205,.75),0 0 60px 22px rgba(255,240,190,.35);animation:moonGlow 5s ease-in-out infinite alternate}
+.wn-moon::before,.wn-moon::after{content:"";position:absolute;border-radius:50%;background:rgba(215,200,150,.35)}
+.wn-moon::before{width:22%;height:22%;left:24%;top:30%}.wn-moon::after{width:14%;height:14%;left:58%;top:56%}
+@keyframes moonGlow{to{box-shadow:0 0 24px 9px rgba(255,246,205,.85),0 0 90px 34px rgba(255,240,190,.42)}}
+.wn-moonlight{position:absolute;inset:0;mix-blend-mode:screen;background:radial-gradient(60% 45% at 76% 16%,rgba(255,244,200,.38),transparent 70%),linear-gradient(200deg,transparent 30%,rgba(210,225,255,.12) 50%,transparent 70%)}
+.wn-stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#FFF8DC;box-shadow:0 0 5px #FFF0B8;animation:twinkle 3s ease-in-out infinite}
