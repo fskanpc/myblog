@@ -92,11 +92,13 @@ VIEWS.home = async el => {
       <figure class="hm-window">
         <span class="hm-tape l" aria-hidden="true"></span><span class="hm-tape r" aria-hidden="true"></span>
         <div class="meadow">
-          <img class="wn-photo" src="img/window-meadow.jpg" alt="" decoding="async">
+          <div class="wn-scene">
+            <img class="wn-photo" src="img/window-meadow.jpg" alt="" decoding="async">
+            <div class="wn-skyclip"><img class="wn-sky" src="img/window-sky.jpg" alt="" decoding="async"></div>
+          </div>
           <div class="wn-storm"></div>
           <div class="md-tint"></div>
           <div class="wn-sun"><span class="wn-sunwash"></span><span class="wn-rays"></span><span class="wn-sundisc"></span></div>
-          <div class="wn-clouds"></div>
           <div class="wn-night"><span class="wn-moonlight"></span><span class="wn-stars"></span><span class="wn-moon"></span></div>
           <div class="wn-bubbles"></div>
           <canvas class="md-rain" aria-hidden="true"></canvas>
@@ -125,12 +127,6 @@ VIEWS.home = async el => {
     const size = 10 + Math.random() * 34, dur = 10 + Math.random() * 12;
     bub.append(h(`<span class="bub" style="left:${(Math.random() * 96).toFixed(1)}%;--sz:${size.toFixed(0)}px;--dur:${dur.toFixed(1)}s;--dl:${(-Math.random() * dur).toFixed(1)}s;--sw:${(8 + Math.random() * 22).toFixed(0)}px;--sd:${(2.5 + Math.random() * 3).toFixed(1)}s"><i></i></span>`));
   }
-  /* soft clouds drifting across the sky */
-  const clouds = $('.wn-clouds', hero);
-  [[6, 30, 95, 0], [22, 24, 120, -.35], [14, 34, 150, -.62], [2, 20, 110, -.82]].forEach(([top, w, dur, at]) => {
-    const puffs = [[16, 62, 34], [34, 44, 46], [55, 40, 50], [74, 58, 36], [45, 72, 44]].map(([x, y, s]) => `<i style="left:${x}%;top:${y}%;width:${s}%"></i>`).join('');
-    clouds.append(h(`<span class="wn-cloud" style="top:${top}%;--cw:${w}%;animation-duration:${dur}s;animation-delay:${(dur * at).toFixed(0)}s"><b>${puffs}</b></span>`));
-  });
   /* twinkling stars: tiny dots plus a few four-point sparkles */
   const stars = $('.wn-stars', hero);
   for(let i = 0; i < 40; i++){

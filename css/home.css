@@ -128,8 +128,15 @@ body[data-route="home"] main{max-width:1240px}
 
 /* window photo with weather animations on top */
 .meadow{background:#9DB8C4}
-.wn-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter 1.4s}
-.wn-storm,.wn-night,.wn-bubbles,.wn-sun,.wn-clouds{position:absolute;inset:0;pointer-events:none;transition:opacity 1.4s}
+.wn-scene{position:absolute;left:0;top:50%;width:100%;aspect-ratio:561/1000;transform:translateY(-50%);transition:filter 1.4s}
+.wn-photo{position:absolute;inset:0;width:100%;height:100%}
+/* the photo's own sky, cut out along the hills, drifts slowly behind them */
+.wn-skyclip{position:absolute;left:0;top:0;width:100%;height:48.8%;overflow:hidden;-webkit-mask:url('../img/window-sky-mask.png') 0 0/100% 100% no-repeat;mask:url('../img/window-sky-mask.png') 0 0/100% 100% no-repeat}
+.wn-sky{position:absolute;top:0;left:-14.97%;width:129.95%;height:100%;max-width:none;transform-origin:50% 100%;animation:skyDrift 80s ease-in-out infinite alternate}
+@keyframes skyDrift{0%{transform:translateX(-8.5%) scale(1)}50%{transform:translateX(0) scale(1.035)}100%{transform:translateX(8.5%) scale(1)}}
+.meadow[data-wx="rain"] .wn-sky{animation-duration:45s}
+.meadow[data-wx="storm"] .wn-sky{animation-duration:30s}
+.wn-storm,.wn-night,.wn-bubbles,.wn-sun{position:absolute;inset:0;pointer-events:none;transition:opacity 1.4s}
 
 /* no-sun days (cloudy / fog): soap bubbles drifting up and swaying */
 .wn-bubbles{overflow:hidden;opacity:0}
@@ -145,13 +152,13 @@ body[data-route="home"] main{max-width:1240px}
 .wn-storm{opacity:0;mix-blend-mode:multiply;background:linear-gradient(180deg,rgba(70,82,110,.9),rgba(88,100,130,.75) 32%,rgba(120,130,150,.35) 50%,transparent 66%)}
 .meadow[data-wx="rain"] .wn-storm,.meadow[data-wx="storm"] .wn-storm{opacity:1}
 .meadow[data-wx="storm"] .wn-storm{background:linear-gradient(180deg,rgba(45,52,78,.95),rgba(60,68,98,.85) 34%,rgba(100,108,130,.4) 52%,transparent 68%)}
-.meadow[data-wx="rain"] .wn-photo,.meadow[data-wx="storm"] .wn-photo{filter:saturate(.72) brightness(.82)}
+.meadow[data-wx="rain"] .wn-scene,.meadow[data-wx="storm"] .wn-scene{filter:saturate(.72) brightness(.82)}
 .meadow[data-wx="rain"] .md-tint,.meadow[data-wx="storm"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(40,55,80,.25),rgba(30,45,60,.15))}
-.meadow[data-wx="cloudy"] .wn-photo,.meadow[data-wx="fog"] .wn-photo{filter:saturate(.8) brightness(.96)}
+.meadow[data-wx="cloudy"] .wn-scene,.meadow[data-wx="fog"] .wn-scene{filter:saturate(.8) brightness(.96)}
 .meadow[data-wx="fog"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(235,240,245,.25),rgba(235,240,245,.5))}
 
 /* night: dark blue photo, glowing moon, moonlight wash and stars */
-.meadow[data-day="0"] .wn-photo{filter:brightness(.45) saturate(.7) hue-rotate(14deg)}
+.meadow[data-day="0"] .wn-scene{filter:brightness(.45) saturate(.7) hue-rotate(14deg)}
 .meadow[data-day="0"] .md-tint{opacity:1;background:linear-gradient(180deg,rgba(14,20,70,.5),rgba(10,18,50,.3))}
 .wn-night{opacity:0}
 .meadow[data-day="0"] .wn-night{opacity:1}
@@ -179,12 +186,4 @@ body[data-route="home"] main{max-width:1240px}
 @keyframes sunPulse{to{box-shadow:0 0 38px 18px rgba(255,240,190,.85),0 0 120px 54px rgba(255,225,150,.42)}}
 @keyframes sunSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
-/* clouds drifting left to right across the sky (all weathers, tinted per mood) */
-.wn-clouds{overflow:hidden;transition:opacity 1.4s,filter 1.4s}
-.wn-cloud{position:absolute;left:0;width:100%;height:0;animation:cloudX linear infinite}
-.wn-cloud b{position:absolute;left:0;top:0;display:block;width:var(--cw);aspect-ratio:2.4;filter:blur(3.5px);opacity:.78}
-.wn-cloud i{position:absolute;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 42% 30%,#FBF9F4 0 22%,#E9E7E2 48%,rgba(205,208,210,.75) 62%,rgba(200,204,208,0) 71%)}
-@keyframes cloudX{from{transform:translateX(-40%)}to{transform:translateX(105%)}}
-.meadow[data-wx="rain"] .wn-clouds,.meadow[data-wx="storm"] .wn-clouds{filter:brightness(.55) saturate(.6)}
-.meadow[data-wx="storm"] .wn-clouds{filter:brightness(.42) saturate(.5)}
-.meadow[data-day="0"] .wn-clouds{opacity:.35;filter:brightness(.5)}
+
