@@ -45,3 +45,23 @@
 .prize{position:relative;display:flex;flex-direction:column;align-items:center;padding:8px 10px 6px;border-radius:16px;background:var(--glass-strong);box-shadow:var(--shadow-sm);min-width:78px}
 .prize .pn{position:absolute;top:4px;right:6px;font-size:12px;font-weight:700;color:#E0708F}
 .prize .pl{font-size:12.5px;color:var(--ink-soft)}
+.claw-machine:focus-visible{outline:3px solid #7F95D8;outline-offset:4px;border-radius:30px}
+
+/* compact machine on the home page, next to the folders */
+.cm-wrap.compact{grid-template-columns:1fr;gap:16px}
+.cm-wrap.compact .claw-machine{max-width:none;padding:16px 16px 14px;border-radius:28px;transform:rotate(-1deg)}
+.cm-wrap.compact .cm-sign{margin-bottom:12px}
+.cm-wrap.compact .cm-sign span{font-size:clamp(22px,2.6vw,28px)}
+.cm-wrap.compact .cm-panel{gap:10px;padding:12px}
+.cm-wrap.compact .slot{width:28px;height:28px}
+.cm-wrap.compact .cm-dir{width:40px;height:40px}
+.cm-wrap.compact .cm-knob{width:40px;height:40px}
+.cm-wrap.compact .cm-drop{width:56px;height:56px}
+.cm-wrap.compact .cm-side{gap:12px}
+.cm-wrap.compact .cm-card{padding:14px 18px;border-radius:24px}
+.cm-wrap.compact .cm-card h3{font-size:16px;margin-bottom:8px}
+.cm-wrap.compact .cm-card p{font-size:13px;margin-top:8px}
+.cm-wrap.compact .coin{width:22px;height:22px}
+.cm-wrap.compact .prize{min-width:66px;padding:6px 8px 4px}
+.cm-wrap.compact .prize canvas{width:44px!important;height:44px!important}
+@media (max-width:1180px) and (min-width:1021px){.cm-wrap.compact .slot{display:none}}

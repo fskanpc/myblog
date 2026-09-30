@@ -81,10 +81,17 @@ function gameState(){
 function saveGame(){ clearTimeout(saveGame.t); saveGame.t = setTimeout(() => Store.setMeta(META).catch(() => {}), 500); }
 
 VIEWS.game = async el => {
-  const g = gameState();
   el.append(pageHead('เกมคีบตุ๊กตา', 'ได้เหรียญฟรีวันละ 5 เหรียญ คีบให้ได้แล้วเก็บไว้บนชั้นของสะสม'));
-  const wrap = h(`<div class="cm-wrap">
-    <div class="claw-machine">
+  el.append(clawMachine({globalKeys:true}));
+};
+
+/* the machine on its own, so the home page can show it next to the folders.
+   globalKeys: arrow keys and Space work anywhere on the page (game page only);
+   otherwise they only work while the machine has focus or a coin is in play */
+function clawMachine({compact = false, globalKeys = false} = {}){
+  const g = gameState();
+  const wrap = h(`<div class="cm-wrap${compact ? ' compact' : ''}">
+    <div class="claw-machine" tabindex="0" aria-label="ตู้คีบตุ๊กตา">
       <div class="cm-sign"><span>LUCKY CATCH</span></div>
       <div class="cm-window">
         <canvas aria-label="ตู้คีบตุ๊กตา" role="img"></canvas>
@@ -116,7 +123,6 @@ VIEWS.game = async el => {
       </section>
     </aside>
   </div>`);
-  el.append(wrap);
 
   const cv = $('canvas', wrap), ctx = cv.getContext('2d');
   const dpr = Math.min(2, devicePixelRatio || 1);
@@ -247,9 +253,17 @@ VIEWS.game = async el => {
   }
   function roundRect(c, x, y, w, hh, r){ c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + hh, r); c.arcTo(x + w, y + hh, x, y + hh, r); c.arcTo(x, y + hh, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
 
-  let raf = 0, lastMove = 0, lastT = performance.now(), acc = 0;
+  let raf = 0, lastMove = 0, lastT = performance.now(), acc = 0, waited = 0, onScreen = true;
+  // pause the simulation while the machine is scrolled out of view
+  if(window.IntersectionObserver) new IntersectionObserver(es => { onScreen = es[0].isIntersecting; }).observe(cv);
   const loop = now => {
-    if(!cv.isConnected){ cancelAnimationFrame(raf); removeEventListener('keydown', onKey); removeEventListener('keyup', onKeyUp); return; }
+    if(!cv.isConnected){
+      // the view is built before it is put on the page, so wait a little before giving up
+      if(!wrap.dataset.live && waited++ < 120){ raf = requestAnimationFrame(loop); return; }
+      cancelAnimationFrame(raf); removeEventListener('keydown', onKey); removeEventListener('keyup', onKeyUp); return;
+    }
+    wrap.dataset.live = '1';
+    if(!onScreen && S.state === 'idle'){ lastT = now || performance.now(); raf = requestAnimationFrame(loop); return; }
     // fixed 60 steps per second, so the claw moves at the same speed on 60 Hz and 120 Hz screens
     acc += Math.min(100, (now || performance.now()) - lastT); lastT = now || performance.now();
     let n = 0; while(acc >= 16.67 && n < 5){ step(); acc -= 16.67; n++; }
@@ -277,6 +291,9 @@ VIEWS.game = async el => {
   });
   const onKey = e => {
     if(document.querySelector('.modal-back')) return;
+    const a = document.activeElement;
+    if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return;
+    if(!globalKeys && !wrap.contains(a) && S.state !== 'ready') return;
     if(e.key === 'ArrowLeft'){ S.dir = -1; e.preventDefault(); }
     else if(e.key === 'ArrowRight'){ S.dir = 1; e.preventDefault(); }
     else if(e.key === ' ' || e.key === 'Enter'){ if(S.state === 'idle') insert(); else drop(); e.preventDefault(); }
@@ -287,4 +304,5 @@ VIEWS.game = async el => {
   renderCoins(); renderShelf();
   say(g.coins > 0 ? 'กด 1 coin เพื่อเริ่มเล่น' : 'เหรียญวันนี้หมดแล้ว พรุ่งนี้มาใหม่นะ');
   raf = requestAnimationFrame(loop);
-};
+  return wrap;
+}
