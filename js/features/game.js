@@ -12,6 +12,8 @@ const PLUSH = {
 const PLUSH_TYPES = Object.keys(PLUSH);
 const DAILY_COINS = 5;
 const CM = {W:360, H:440, railY:22, chuteX:98, chuteTop:300, homeX:54};
+/* claw arms: w = how far each arm reaches out sideways */
+const CLAW = {len:44, tip:16, open:40, rest:22, shut:7};
 
 function drawPlush(ctx, type, r, ang = 0){
   const P = PLUSH[type], line = '#9A7589';
@@ -148,7 +150,9 @@ function clawMachine({compact = false, globalKeys = false} = {}){
   };
 
   /* ---- world ---- */
-  const S = {state:'idle', x:CM.homeX, rope:30, open:.62, held:null, dir:0, slipAt:0, t:0};
+  const S = {state:'idle', x:CM.homeX, rope:30, w:CLAW.rest, target:CLAW.rest, held:null, dir:0, slipAt:0, t:0};
+  const hubY = () => CM.railY + 22 + S.rope;              // bottom of the claw's hub; arms hinge here
+  const holdY = p => hubY() + p.r * .88;                   // plush centre when it hangs inside the claw
   const plush = [];
   const addPlush = (x, y) => { const type = PLUSH_TYPES[(Math.random() * PLUSH_TYPES.length) | 0]; plush.push({type, x, y, vx:0, vy:0, r:25 + Math.random() * 6, a:(Math.random() - .5) * .6, va:0, won:false, fade:1}); };
   for(let i = 0; i < 15; i++) addPlush(125 + Math.random() * 210, 150 + Math.random() * 260);
@@ -157,7 +161,7 @@ function clawMachine({compact = false, globalKeys = false} = {}){
   function physics(){
     for(const p of plush){
       if(p === S.held) continue;
-      p.vy += .45; p.vx *= .985; p.vy *= .995; p.x += p.vx; p.y += p.vy; p.a += p.va; p.va *= .95;
+      p.vy += .45; p.vx *= .985; p.vy *= .995; p.x += p.vx; p.y += p.vy; p.va = (p.va - p.a * .004) * .86; p.a = Math.max(-.45, Math.min(.45, p.a + p.va));
       const floor = CM.H - p.r * .9;
       if(p.y > floor){ p.y = floor; p.vy *= -.15; p.vx *= .8; }
       if(p.x < 12 + p.r){ p.x = 12 + p.r; p.vx *= -.3; }
@@ -174,43 +178,47 @@ function clawMachine({compact = false, globalKeys = false} = {}){
         const push = (min - d) / 2, nx = dx / d, ny = dy / d;
         a.x -= nx * push; a.y -= ny * push; b.x += nx * push; b.y += ny * push;
         const rv = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
-        if(rv < 0){ const imp = -rv * .6; a.vx -= nx * imp / 2; a.vy -= ny * imp / 2; b.vx += nx * imp / 2; b.vy += ny * imp / 2; a.va -= nx * .01; b.va += nx * .01; }
+        if(rv < 0){ const imp = -rv * .6; a.vx -= nx * imp / 2; a.vy -= ny * imp / 2; b.vx += nx * imp / 2; b.vy += ny * imp / 2; if(rv < -1.2){ a.va -= nx * .03; b.va += nx * .03; } }
       }
     }
   }
-  const clawTip = () => CM.railY + 16 + S.rope + 44;
 
   function step(){
     const sp = 2.4;
     if(S.state === 'ready' && S.dir){ S.x = Math.max(CM.homeX, Math.min(CM.W - 40, S.x + S.dir * sp)); }
     else if(S.state === 'down'){
       S.rope += 3.2;
-      const tip = clawTip();
-      const hit = plush.some(p => Math.abs(p.x - S.x) < p.r * .9 && tip >= p.y - p.r * .55 && p.x > CM.chuteX);
-      if(hit || tip >= CM.H - 4){ S.state = 'close'; S.t = 0; Blip.grab(); }
-    } else if(S.state === 'close'){
-      S.open = Math.max(.14, S.open - .03);
-      if(S.open <= .14){
-        const headY = CM.railY + 16 + S.rope;
+      // stop when the hub reaches the top of a plush right under it, or the floor
+      const hit = plush.some(p => p.x > CM.chuteX && Math.abs(p.x - S.x) < p.r * .9 && hubY() >= p.y - p.r * .9);
+      if(hit || hubY() + CLAW.len * .7 >= CM.H - 4){
+        S.state = 'close'; Blip.grab();
         let best = null, bd = 1e9;
-        for(const p of plush){ const dx = Math.abs(p.x - S.x), dy = Math.abs(p.y - (headY + 36)); if(p.x > CM.chuteX && dx < p.r * .95 && dy < p.r + 16 && dx < bd){ bd = dx; best = p; } }
+        for(const p of plush){ const dx = Math.abs(p.x - S.x); if(p.x > CM.chuteX && dx < p.r * .95 && Math.abs(p.y - holdY(p)) < p.r * .6 && dx < bd){ bd = dx; best = p; } }
         const chance = best ? Math.max(.15, Math.min(.88, .92 - bd / best.r * .75)) : 0;
-        if(best && Math.random() < chance){ S.held = best; best.vx = best.vy = 0; S.slipAt = Math.random() < .2 ? CM.homeX + 30 + Math.random() * Math.max(10, S.x - CM.homeX - 40) : -1; }
-        S.state = 'up';
+        S.grab = best && Math.random() < chance ? best : null;
+        // arms close until they touch the plush; a miss squeezes past it
+        S.target = S.grab ? S.grab.r + 3 : CLAW.shut;
+      }
+    } else if(S.state === 'close'){
+      S.w = Math.max(S.target, S.w - 1.1);
+      if(S.grab && S.w < S.grab.r + 14){ const p = S.grab; p.vx += (S.x - p.x) * .08; p.vy = Math.min(p.vy, 0); }
+      if(S.w <= S.target){
+        if(S.grab){ S.held = S.grab; S.held.vx = S.held.vy = 0; S.slipAt = Math.random() < .2 ? CM.homeX + 30 + Math.random() * Math.max(10, S.x - CM.homeX - 40) : -1; }
+        S.grab = null; S.state = 'up';
       }
     } else if(S.state === 'up'){
       S.rope = Math.max(30, S.rope - 2.6);
       if(S.rope <= 30){ S.state = 'carry'; if(!S.held){ say('พลาดไปนิดเดียว ลองใหม่นะ', 2200); Blip.miss(); } }
     } else if(S.state === 'carry'){
       S.x = Math.max(CM.homeX, S.x - 2.2);
-      if(S.held && S.slipAt > 0 && S.x <= S.slipAt){ const p = S.held; S.held = null; p.vy = 1; p.va = (Math.random() - .5) * .1; say('โอ๊ะ หลุดมือ ลองใหม่นะ', 2200); Blip.miss(); }
+      if(S.held && S.slipAt > 0 && S.x <= S.slipAt){ const p = S.held; S.held = null; S.w = S.target = CLAW.rest; p.vy = 1; p.va = (Math.random() - .5) * .1; say('โอ๊ะ หลุดมือ ลองใหม่นะ', 2200); Blip.miss(); }
       if(S.x <= CM.homeX){ S.state = 'release'; }
     } else if(S.state === 'release'){
-      S.open = Math.min(.62, S.open + .04);
-      if(S.open >= .5 && S.held){ const p = S.held; S.held = null; p.vy = 2; p.vx = .3; }
-      if(S.open >= .62){ S.state = 'idle'; renderCoins(); if(!plush.some(p => p.x < CM.chuteX && !p.won)) say(g.coins > 0 ? 'ใส่เหรียญเพื่อเล่นอีกครั้ง' : 'เหรียญวันนี้หมดแล้ว พรุ่งนี้มาใหม่นะ'); }
+      S.w = Math.min(CLAW.open, S.w + 1.2);
+      if(S.held && S.w >= S.held.r + 10){ const p = S.held; S.held = null; p.vy = 2; p.vx = .3; }
+      if(S.w >= CLAW.open){ S.w = S.target = CLAW.rest; S.state = 'idle'; renderCoins(); if(!plush.some(p => p.x < CM.chuteX && !p.won)) say(g.coins > 0 ? 'ใส่เหรียญเพื่อเล่นอีกครั้ง' : 'เหรียญวันนี้หมดแล้ว พรุ่งนี้มาใหม่นะ'); }
     }
-    if(S.held){ const headY = CM.railY + 16 + S.rope; S.held.x = S.x; S.held.y = headY + 34 + S.held.r * .55; S.held.a *= .9; }
+    if(S.held){ S.held.x = S.x; S.held.y = holdY(S.held); S.held.a *= .9; S.held.va = 0; }
     physics();
     // prizes that reach the bottom of the chute
     for(const p of plush){
@@ -237,19 +245,22 @@ function clawMachine({compact = false, globalKeys = false} = {}){
     // plush (back to front by y)
     [...plush].sort((a, b) => a.y - b.y).forEach(p => { c.save(); c.globalAlpha = Math.max(0, p.fade); c.translate(p.x, p.y); drawPlush(c, p.type, p.r, p.a); c.restore(); });
     // rail + carriage + claw
-    const headY = CM.railY + 16 + S.rope;
+    const hy = hubY();
     c.fillStyle = '#AFC0F2'; c.strokeStyle = '#7F95D8'; c.lineWidth = 2;
     roundRect(c, 6, CM.railY - 5, CM.W - 12, 10, 5); c.fill(); c.stroke();
     roundRect(c, S.x - 20, CM.railY - 10, 40, 22, 6); c.fillStyle = '#D5DEFA'; c.fill(); c.stroke();
-    c.strokeStyle = '#9CAEE8'; c.lineWidth = 5; c.beginPath(); c.moveTo(S.x, CM.railY + 12); c.lineTo(S.x, headY); c.stroke();
-    c.fillStyle = '#8FA3E8'; c.beginPath(); c.arc(S.x, headY, 8, 0, 7); c.fill();
-    c.fillStyle = '#FFC4D6'; c.beginPath(); c.arc(S.x, headY + 6, 6, 0, 7); c.fill();
-    c.strokeStyle = '#7F95D8'; c.lineWidth = 5; c.lineCap = 'round';
+    c.strokeStyle = '#9CAEE8'; c.lineWidth = 5; c.beginPath(); c.moveTo(S.x, CM.railY + 12); c.lineTo(S.x, hy - 10); c.stroke();
+    // arms: hinge at the hub, knee out at the side of the plush, tip curls in under it
+    c.lineCap = 'round'; c.lineJoin = 'round';
     for(const s of [-1, 1]){
-      const a = S.open, x1 = S.x + s * Math.sin(a) * 28, y1 = headY + Math.cos(a) * 28;
-      const x2 = x1 - s * 11, y2 = y1 + 14;
-      c.beginPath(); c.moveTo(S.x + s * 3, headY + 4); c.lineTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+      const w = S.w, kx = S.x + s * w, ky = hy + Math.sqrt(Math.max(0, CLAW.len * CLAW.len - w * w)) * .78;
+      const tx = kx - s * Math.max(4, w * .42), ty = ky + CLAW.tip;
+      c.strokeStyle = '#6F86D2'; c.lineWidth = 7; c.beginPath(); c.moveTo(S.x + s * 5, hy); c.quadraticCurveTo(kx + s * 3, hy + 2, kx, ky); c.lineTo(tx, ty); c.stroke();
+      c.strokeStyle = '#B7C6F6'; c.lineWidth = 3; c.beginPath(); c.moveTo(S.x + s * 5, hy); c.quadraticCurveTo(kx + s * 3, hy + 2, kx, ky); c.lineTo(tx, ty); c.stroke();
+      c.fillStyle = '#FFC4D6'; c.beginPath(); c.arc(tx, ty, 3.2, 0, 7); c.fill();
     }
+    c.fillStyle = '#8FA3E8'; roundRect(c, S.x - 15, hy - 14, 30, 16, 8); c.fill();
+    c.fillStyle = '#FFC4D6'; c.beginPath(); c.arc(S.x, hy - 6, 5, 0, 7); c.fill();
   }
   function roundRect(c, x, y, w, hh, r){ c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + hh, r); c.arcTo(x + w, y + hh, x, y + hh, r); c.arcTo(x, y + hh, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
 
@@ -280,7 +291,7 @@ function clawMachine({compact = false, globalKeys = false} = {}){
     g.coins--; saveGame(); Blip.coin(); S.state = 'ready'; renderCoins();
     say('เลื่อนที่คีบแล้วกดปุ่มแดง', 2400);
   };
-  const drop = () => { if(S.state !== 'ready') return; S.state = 'down'; S.dir = 0; Blip.drop(); msg.classList.remove('show'); };
+  const drop = () => { if(S.state !== 'ready') return; S.state = 'down'; S.w = S.target = CLAW.open; S.dir = 0; Blip.drop(); msg.classList.remove('show'); };
   $('.cm-coin', wrap).onclick = insert;
   $('.cm-drop', wrap).onclick = drop;
   $$('.cm-dir', wrap).forEach(b => {
