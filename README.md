@@ -41,6 +41,7 @@ my-little-bubble/
 │   │   ├── music.js        เพลงโปรด + การสแครชแผ่นเสียง
 │   │   ├── vocab.js        สมุดคำศัพท์ + โหมดท่อง
 │   │   ├── planner.js      แพลนเนอร์
+│   │   ├── photobooth.js   โฟโต้บูธ: ถ่ายหรือเลือกรูป กดปริ้น แล้วติดบนบอร์ดความทรงจำ
 │   │   └── profile.js      โปรไฟล์ + หน้าข้อมูลพาสปอร์ต + เปลี่ยนรหัสผ่าน
 │   └── main.js             จุดเริ่มต้น (เชื่อม Supabase แล้วเปิดแอป)
 ├── supabase/schema.sql     ตาราง + สิทธิ์การเข้าถึง
@@ -120,6 +121,21 @@ git push -u origin main
 - **Vercel / Netlify**: Import repo จาก GitHub เลือก framework เป็น "Other" หรือ static ไม่ต้องตั้ง build command
 
 เสร็จแล้วอย่าลืมกลับไปใส่ URL นี้ใน Supabase ตามข้อ 4
+
+## อัปเดตฐานข้อมูลสำหรับโฟโต้บูธ (ทำครั้งเดียว)
+
+ถ้าสร้างฐานข้อมูลไว้ก่อนมีหมวดโฟโต้บูธ ต้องบอกฐานข้อมูลให้รับหมวดใหม่ก่อน ไม่อย่างนั้นกด PRINT แล้วจะบันทึกไม่ได้
+
+1. เปิด Supabase Dashboard → เลือกโปรเจกต์ → **SQL Editor** → **New query**
+2. วางคำสั่งนี้แล้วกด **Run**
+
+```sql
+alter table public.items drop constraint if exists items_section_check;
+alter table public.items add constraint items_section_check
+  check (section in ('diary','books','tarot','travel','screen','music','vocab','planner','photobooth'));
+```
+
+คำสั่งนี้ไม่ลบข้อมูลเดิม และรันซ้ำได้ (อยู่ใน `supabase/schema.sql` ข้อ 2.1 ด้วย)
 
 ## ข้อมูลเก็บอย่างไร
 

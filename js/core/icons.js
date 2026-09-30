@@ -43,6 +43,7 @@ const APPS = [
   {id:'music',   name:'เพลงโปรด',       icon:'music',   c1:'#3EC6A6', c2:'#A3EAD6'},
   {id:'vocab',   name:'สมุดคำศัพท์',    icon:'vocab',   c1:'#F7B928', c2:'#FFE38C'},
   {id:'planner', name:'แพลนเนอร์',      icon:'planner', c1:'#6F8DFF', c2:'#B3C4FF'},
+  {id:'photobooth', name:'โฟโต้บูธ',     icon:'camera',  c1:'#F47C9B', c2:'#FFC2D1'},
   {id:'game',    name:'เกมคีบตุ๊กตา',   icon:'claw',    c1:'#FF7FA8', c2:'#FFC6D8'},
   {id:'profile', name:'โปรไฟล์',        icon:'profile', c1:'#C07CFF', c2:'#E6C8FF'}
 ];

@@ -8,17 +8,22 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
--- 2) ข้อมูลทุกหมวด (ไดอารี่ หนังสือ ไพ่ ที่เที่ยว หนัง เพลง คำศัพท์ แพลนเนอร์)
+-- 2) ข้อมูลทุกหมวด (ไดอารี่ หนังสือ ไพ่ ที่เที่ยว หนัง เพลง คำศัพท์ แพลนเนอร์ โฟโต้บูธ)
 create table if not exists public.items (
   user_id    uuid not null default auth.uid() references auth.users(id) on delete cascade,
   id         text not null,
-  section    text not null check (section in ('diary','books','tarot','travel','screen','music','vocab','planner')),
+  section    text not null check (section in ('diary','books','tarot','travel','screen','music','vocab','planner','photobooth')),
   data       jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   primary key (user_id, id)
 );
 create index if not exists items_user_section_idx on public.items (user_id, section);
+
+-- 2.1) ฐานข้อมูลที่สร้างไว้ก่อนมีโฟโต้บูธ: อัปเดตรายชื่อหมวดให้รับ 'photobooth' ด้วย (รันซ้ำได้ ไม่กระทบข้อมูลเดิม)
+alter table public.items drop constraint if exists items_section_check;
+alter table public.items add constraint items_section_check
+  check (section in ('diary','books','tarot','travel','screen','music','vocab','planner','photobooth'));
 
 -- 3) อัปเดตเวลาแก้ไขล่าสุดอัตโนมัติ
 create or replace function public.touch_updated_at() returns trigger

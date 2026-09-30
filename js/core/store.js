@@ -1,7 +1,7 @@
 /* =========================================================
    storage: Supabase (Postgres + Row Level Security)
    ========================================================= */
-const SECTIONS = ['diary','books','tarot','travel','screen','music','vocab','planner'];
+const SECTIONS = ['diary','books','tarot','travel','screen','music','vocab','planner','photobooth'];
 const Store = {
   mode:'supabase', uid:null, email:'', sb:null, cache:{},
   init(){

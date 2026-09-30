@@ -11,6 +11,7 @@ const FOLDER_THEME = {
   vocab:  {bg:'#FFF6D6', ink:'#F2C24E', tab:'#FBE39B', icon:'#D39A12'},
   planner:{bg:'#EEF1FF', ink:'rgba(130,150,245,.5)', tab:'#CCD5FB', icon:'#6480EE'},
   profile:{bg:'#FBE4B7', ink:'#F08CAA', tab:'#EFCB8A', icon:'#E0708F'},
+  photobooth:{bg:'#FFE6EC', ink:'#EF8FA7', tab:'#FFC2D1', icon:'#D9507F'},
   game:   {bg:'#FFE9F0', ink:'rgba(255,127,168,.35)', tab:'#FFC6D8', icon:'#F0648F'}
 };
 const FOLDER_PAT = (() => {
@@ -31,6 +32,7 @@ const FOLDER_PAT = (() => {
     vocab:`linear-gradient(90deg,transparent 21%,${T.vocab.ink} 21% 22%,transparent 22% 24%,${T.vocab.ink} 24% 25%,transparent 25%),linear-gradient(180deg,transparent 12%,${T.vocab.ink} 12% 13.5%,transparent 13.5% 17%,${T.vocab.ink} 17% 18.5%,transparent 18.5%),${T.vocab.bg}`,
     planner:`repeating-linear-gradient(90deg,${T.planner.ink} 0 10px,transparent 10px 22px),${T.planner.bg}`,
     profile:`${heart(T.profile.ink)} 0 0/40px 40px,${T.profile.bg}`,
+    photobooth:`radial-gradient(circle,#FFF6F8 0 2.6px,transparent 3.1px) 4px 5px/14px 18px repeat-x,radial-gradient(circle,#FFF6F8 0 2.6px,transparent 3.1px) 4px calc(100% - 5px)/14px 18px repeat-x,linear-gradient(${T.photobooth.ink},${T.photobooth.ink}) top/100% 18px no-repeat,linear-gradient(${T.photobooth.ink},${T.photobooth.ink}) bottom/100% 18px no-repeat,${T.photobooth.bg}`,
     game:`radial-gradient(circle,#FFE38C 0 3px,transparent 3.5px) 6px 6px/22px 22px,repeating-linear-gradient(135deg,${T.game.ink} 0 9px,transparent 9px 18px),${T.game.bg}`
   };
 })();
