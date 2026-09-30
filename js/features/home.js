@@ -1,5 +1,5 @@
 /* =========================================================
-   HOME: greeting card + photo window + folders + claw machine
+   HOME: train banner with greeting card + weather sign, folders, claw machine
    ========================================================= */
 const FOLDER_THEME = {
   diary:  {bg:'#FFDCE8', ink:'#E47AA3', tab:'#F8C3D6'},
@@ -75,6 +75,18 @@ VIEWS.home = async el => {
   const page = h(`<div class="hm">
     <div class="hm-deco" aria-hidden="true"></div>
     <section class="hm-hero" aria-label="${T('หน้าแรก')}">
+      <div class="hm-scene meadow">
+        ${trainScene()}
+        <div class="wn-bubbles"></div>
+        <div class="md-tint"></div>
+        <canvas class="md-rain" aria-hidden="true"></canvas>
+        <div class="md-flash"></div>
+        <button class="hm-station md-weather" title="เปลี่ยนโหมดสภาพอากาศ">
+          <span class="st-cap">สภาพอากาศวันนี้</span>
+          <span class="st-row"><span class="wi">☁️</span><span class="wt">กำลังดูสภาพอากาศ…</span></span>
+          <span class="wm"></span>
+        </button>
+      </div>
       <div class="hm-card">
         <span class="hm-tape" aria-hidden="true"></span>
         <span class="hm-date">${dayLine(ymd())}</span>
@@ -85,26 +97,9 @@ VIEWS.home = async el => {
           <span class="mg-line"><span class="mg-text"></span><span class="mg-caret"></span></span>
         </div>
         <div class="hm-chips">
-          <button class="hm-chip md-weather" title="เปลี่ยนโหมดสภาพอากาศ"><span class="wi">☁️</span><span class="wt">กำลังดูสภาพอากาศ…</span><span class="wm"></span></button>
           ${chips.join('')}
         </div>
       </div>
-      <figure class="hm-window">
-        <span class="hm-tape l" aria-hidden="true"></span><span class="hm-tape r" aria-hidden="true"></span>
-        <div class="meadow">
-          <div class="wn-scene">
-            <img class="wn-photo" src="img/window-meadow.jpg" alt="" decoding="async">
-            <div class="wn-skyclip"><img class="wn-sky" src="img/window-sky.jpg" alt="" decoding="async"></div>
-          </div>
-          <div class="wn-storm"></div>
-          <div class="md-tint"></div>
-          <div class="wn-night"><span class="wn-moonlight"></span><span class="wn-stars"></span><span class="wn-moon"></span></div>
-          <div class="wn-bubbles"></div>
-          <canvas class="md-rain" aria-hidden="true"></canvas>
-          <div class="md-flash"></div>
-        </div>
-        <figcaption>หน้าต่างวันนี้</figcaption>
-      </figure>
     </section>
     <section class="hm-board" id="folders">
       <div class="hm-cols">
@@ -120,17 +115,11 @@ VIEWS.home = async el => {
   </div>`);
   const hero = $('.meadow', page);
 
-  /* window animation layers: floating bubbles (sunny) and twinkling stars (night) */
+  /* soap bubbles that float up on cloudy days */
   const bub = $('.wn-bubbles', hero);
   for(let i = 0; i < 22; i++){
     const size = 10 + Math.random() * 34, dur = 10 + Math.random() * 12;
     bub.append(h(`<span class="bub" style="left:${(Math.random() * 96).toFixed(1)}%;--sz:${size.toFixed(0)}px;--dur:${dur.toFixed(1)}s;--dl:${(-Math.random() * dur).toFixed(1)}s;--sw:${(8 + Math.random() * 22).toFixed(0)}px;--sd:${(2.5 + Math.random() * 3).toFixed(1)}s"><i></i></span>`));
-  }
-  /* twinkling stars: tiny dots plus a few four-point sparkles */
-  const stars = $('.wn-stars', hero);
-  for(let i = 0; i < 40; i++){
-    const big = i < 7, dl = (-Math.random() * 4).toFixed(1), du = (1.8 + Math.random() * 2.6).toFixed(1);
-    stars.append(h(`<i class="${big ? 'sp' : ''}" style="left:${(2 + Math.random() * 96).toFixed(1)}%;top:${(1 + Math.random() * 40).toFixed(1)}%;--ss:${big ? (9 + Math.random() * 7).toFixed(0) : (1.5 + Math.random() * 1.8).toFixed(1)}px;animation-delay:${dl}s;animation-duration:${du}s"></i>`));
   }
 
   const deco = $('.hm-deco', page);
