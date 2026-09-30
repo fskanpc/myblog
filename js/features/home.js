@@ -92,7 +92,7 @@ VIEWS.home = async el => {
       <figure class="hm-window">
         <span class="hm-tape l" aria-hidden="true"></span><span class="hm-tape r" aria-hidden="true"></span>
         <div class="meadow">
-          <img class="wn-photo" src="img/window-bubbles.jpg" alt="" decoding="async">
+          <img class="wn-photo" src="img/window-meadow.jpg" alt="" decoding="async">
           <div class="wn-storm"></div>
           <div class="md-tint"></div>
           <div class="wn-night"><span class="wn-moonlight"></span><span class="wn-stars"></span><span class="wn-moon"></span></div>
@@ -119,7 +119,7 @@ VIEWS.home = async el => {
 
   /* window animation layers: floating bubbles (sunny) and twinkling stars (night) */
   const bub = $('.wn-bubbles', hero);
-  for(let i = 0; i < 16; i++){
+  for(let i = 0; i < 22; i++){
     const size = 10 + Math.random() * 34, dur = 10 + Math.random() * 12;
     bub.append(h(`<span class="bub" style="left:${(Math.random() * 96).toFixed(1)}%;--sz:${size.toFixed(0)}px;--dur:${dur.toFixed(1)}s;--dl:${(-Math.random() * dur).toFixed(1)}s;--sw:${(8 + Math.random() * 22).toFixed(0)}px;--sd:${(2.5 + Math.random() * 3).toFixed(1)}s"><i></i></span>`));
   }
