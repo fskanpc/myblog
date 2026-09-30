@@ -154,14 +154,14 @@ function clawMachine({compact = false, globalKeys = false} = {}){
   const hubY = () => CM.railY + 22 + S.rope;              // bottom of the claw's hub; arms hinge here
   const holdY = p => hubY() + p.r * .88;                   // plush centre when it hangs inside the claw
   const plush = [];
-  const addPlush = (x, y) => { const type = PLUSH_TYPES[(Math.random() * PLUSH_TYPES.length) | 0]; plush.push({type, x, y, vx:0, vy:0, r:25 + Math.random() * 6, a:(Math.random() - .5) * .6, va:0, won:false, fade:1}); };
+  const addPlush = (x, y) => { const type = PLUSH_TYPES[(Math.random() * PLUSH_TYPES.length) | 0]; plush.push({type, x, y, vx:0, vy:0, r:25 + Math.random() * 6, won:false, fade:1}); };
   for(let i = 0; i < 15; i++) addPlush(125 + Math.random() * 210, 150 + Math.random() * 260);
   for(let k = 0; k < 240; k++) physics();
 
   function physics(){
     for(const p of plush){
       if(p === S.held) continue;
-      p.vy += .45; p.vx *= .985; p.vy *= .995; p.x += p.vx; p.y += p.vy; p.va = (p.va - p.a * .004) * .86; p.a = Math.max(-.45, Math.min(.45, p.a + p.va));
+      p.vy += .45; p.vx *= .985; p.vy *= .995; p.x += p.vx; p.y += p.vy;
       const floor = CM.H - p.r * .9;
       if(p.y > floor){ p.y = floor; p.vy *= -.15; p.vx *= .8; }
       if(p.x < 12 + p.r){ p.x = 12 + p.r; p.vx *= -.3; }
@@ -178,7 +178,7 @@ function clawMachine({compact = false, globalKeys = false} = {}){
         const push = (min - d) / 2, nx = dx / d, ny = dy / d;
         a.x -= nx * push; a.y -= ny * push; b.x += nx * push; b.y += ny * push;
         const rv = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
-        if(rv < 0){ const imp = -rv * .6; a.vx -= nx * imp / 2; a.vy -= ny * imp / 2; b.vx += nx * imp / 2; b.vy += ny * imp / 2; if(rv < -1.2){ a.va -= nx * .03; b.va += nx * .03; } }
+        if(rv < 0){ const imp = -rv * .6; a.vx -= nx * imp / 2; a.vy -= ny * imp / 2; b.vx += nx * imp / 2; b.vy += ny * imp / 2; }
       }
     }
   }
@@ -211,14 +211,14 @@ function clawMachine({compact = false, globalKeys = false} = {}){
       if(S.rope <= 30){ S.state = 'carry'; if(!S.held){ say('พลาดไปนิดเดียว ลองใหม่นะ', 2200); Blip.miss(); } }
     } else if(S.state === 'carry'){
       S.x = Math.max(CM.homeX, S.x - 2.2);
-      if(S.held && S.slipAt > 0 && S.x <= S.slipAt){ const p = S.held; S.held = null; S.w = S.target = CLAW.rest; p.vy = 1; p.va = (Math.random() - .5) * .1; say('โอ๊ะ หลุดมือ ลองใหม่นะ', 2200); Blip.miss(); }
+      if(S.held && S.slipAt > 0 && S.x <= S.slipAt){ const p = S.held; S.held = null; S.w = S.target = CLAW.rest; p.vy = 1; say('โอ๊ะ หลุดมือ ลองใหม่นะ', 2200); Blip.miss(); }
       if(S.x <= CM.homeX){ S.state = 'release'; }
     } else if(S.state === 'release'){
       S.w = Math.min(CLAW.open, S.w + 1.2);
       if(S.held && S.w >= S.held.r + 10){ const p = S.held; S.held = null; p.vy = 2; p.vx = .3; }
       if(S.w >= CLAW.open){ S.w = S.target = CLAW.rest; S.state = 'idle'; renderCoins(); if(!plush.some(p => p.x < CM.chuteX && !p.won)) say(g.coins > 0 ? 'ใส่เหรียญเพื่อเล่นอีกครั้ง' : 'เหรียญวันนี้หมดแล้ว พรุ่งนี้มาใหม่นะ'); }
     }
-    if(S.held){ S.held.x = S.x; S.held.y = holdY(S.held); S.held.a *= .9; S.held.va = 0; }
+    if(S.held){ S.held.x = S.x; S.held.y = holdY(S.held); }
     physics();
     // prizes that reach the bottom of the chute
     for(const p of plush){
@@ -243,7 +243,7 @@ function clawMachine({compact = false, globalKeys = false} = {}){
     c.fillStyle = '#E0708F'; c.font = '700 11px system-ui,sans-serif'; c.textAlign = 'center'; c.fillText('PRIZE', 55, CM.chuteTop + 18);
     c.beginPath(); c.moveTo(48, CM.chuteTop + 26); c.lineTo(62, CM.chuteTop + 26); c.lineTo(55, CM.chuteTop + 35); c.fill();
     // plush (back to front by y)
-    [...plush].sort((a, b) => a.y - b.y).forEach(p => { c.save(); c.globalAlpha = Math.max(0, p.fade); c.translate(p.x, p.y); drawPlush(c, p.type, p.r, p.a); c.restore(); });
+    [...plush].sort((a, b) => a.y - b.y).forEach(p => { c.save(); c.globalAlpha = Math.max(0, p.fade); c.translate(p.x, p.y); drawPlush(c, p.type, p.r); c.restore(); });
     // rail + carriage + claw
     const hy = hubY();
     c.fillStyle = '#AFC0F2'; c.strokeStyle = '#7F95D8'; c.lineWidth = 2;
