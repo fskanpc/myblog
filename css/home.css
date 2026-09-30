@@ -136,7 +136,7 @@ body[data-route="home"] main{max-width:1240px}
 @keyframes skyDrift{0%{transform:translateX(-8.5%) scale(1)}50%{transform:translateX(0) scale(1.035)}100%{transform:translateX(8.5%) scale(1)}}
 .meadow[data-wx="rain"] .wn-sky{animation-duration:45s}
 .meadow[data-wx="storm"] .wn-sky{animation-duration:30s}
-.wn-storm,.wn-night,.wn-bubbles,.wn-sun{position:absolute;inset:0;pointer-events:none;transition:opacity 1.4s}
+.wn-storm,.wn-night,.wn-bubbles{position:absolute;inset:0;pointer-events:none;transition:opacity 1.4s}
 
 /* no-sun days (cloudy / fog): soap bubbles drifting up and swaying */
 .wn-bubbles{overflow:hidden;opacity:0}
@@ -174,16 +174,5 @@ body[data-route="home"] main{max-width:1240px}
 .wn-stars i.sp::after{transform:rotate(45deg) scale(.55);opacity:.8}
 @keyframes starTw{0%,100%{opacity:1;transform:scale(1) rotate(0)}50%{opacity:.15;transform:scale(.45) rotate(25deg)}}
 
-/* sunny: warm sunlight with slowly turning rays */
-.wn-sun{opacity:0}
-.meadow[data-day="1"][data-wx="clear"] .wn-sun,.meadow[data-day="1"][data-wx="partly"] .wn-sun{opacity:1}
-.meadow[data-wx="partly"] .wn-sun{opacity:.75}
-.wn-sunwash{position:absolute;inset:0;mix-blend-mode:screen;background:radial-gradient(75% 55% at 20% 8%,rgba(255,236,180,.55),rgba(255,220,150,.18) 45%,transparent 72%)}
-.wn-rays{position:absolute;left:20%;top:8%;width:170%;aspect-ratio:1;transform:translate(-50%,-50%);mix-blend-mode:screen;opacity:.5;
-  background:repeating-conic-gradient(from 0deg,rgba(255,245,210,.55) 0deg 5deg,transparent 5deg 18deg);
-  -webkit-mask:radial-gradient(circle,#000 4%,rgba(0,0,0,.5) 22%,transparent 48%);mask:radial-gradient(circle,#000 4%,rgba(0,0,0,.5) 22%,transparent 48%);animation:sunSpin 90s linear infinite}
-.wn-sundisc{position:absolute;left:20%;top:8%;width:13%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#FFFEF4 0 40%,#FFF1B8 62%,rgba(255,230,150,0) 72%);box-shadow:0 0 30px 14px rgba(255,240,190,.75),0 0 90px 40px rgba(255,225,150,.35);animation:sunPulse 4s ease-in-out infinite alternate}
-@keyframes sunPulse{to{box-shadow:0 0 38px 18px rgba(255,240,190,.85),0 0 120px 54px rgba(255,225,150,.42)}}
-@keyframes sunSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
 

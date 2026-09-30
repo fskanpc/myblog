@@ -98,7 +98,6 @@ VIEWS.home = async el => {
           </div>
           <div class="wn-storm"></div>
           <div class="md-tint"></div>
-          <div class="wn-sun"><span class="wn-sunwash"></span><span class="wn-rays"></span><span class="wn-sundisc"></span></div>
           <div class="wn-night"><span class="wn-moonlight"></span><span class="wn-stars"></span><span class="wn-moon"></span></div>
           <div class="wn-bubbles"></div>
           <canvas class="md-rain" aria-hidden="true"></canvas>
