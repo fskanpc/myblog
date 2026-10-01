@@ -17,6 +17,7 @@ const Vocab = {
   add(all){ openForm({title:'เพิ่มคำศัพท์', fields:vocabFields(all), value:{}, onSave: async v => { await Store.save('vocab', v); rerender(); }}); },
   edit(w, all){ openForm({title:'แก้ไขคำศัพท์', fields:vocabFields(all), value:w, onSave: async v => { await Store.save('vocab', v); rerender(); }, onDelete: async () => { await Store.remove('vocab', w.id); rerender(); }}); }
 };
+let vocabSort = {key:'', dir:1};
 let vocabMode = 'book', vocabQ = '', vocabDeck = null, vocabIdx = 0, vocabKnown = 0, vocabCat = '*';
 async function saveCats(list){ META.vocabCats = list; try{ await Store.setMeta(META); }catch(e){ toast('บันทึกไม่สำเร็จ'); } }
 function newCategory(all){
@@ -74,26 +75,51 @@ VIEWS.vocab = async el => {
   if(!all.length) return el.append(emptyState('vocab', 'หมวดนี้ยังว่าง จดคำแรกของหมวดนี้เลย', 'จดคำใหม่', () => Vocab.add(every)));
   if(vocabMode === 'practice') return practice(el, all);
   const tools = h(`<div class="vtools"><input type="search" placeholder="ค้นหาคำหรือความหมาย" aria-label="ค้นหาคำศัพท์" value="${escT(vocabQ)}"></div>`);
-  const book = h('<div class="notebook"><div class="rings" aria-hidden="true">' + '<i></i>'.repeat(6) + '</div><div class="vlist"></div></div>');
+  const book = h(`<div class="vtable-wrap"><table class="vtable">
+    <thead><tr>
+      <th class="c-img"><span class="sr">รูป</span></th>
+      <th class="c-word"><button data-sort="word">คำศัพท์</button></th>
+      <th class="c-read">คำอ่าน</th>
+      <th class="c-pos">ชนิดคำ</th>
+      <th class="c-mean"><button data-sort="meaning">ความหมาย</button></th>
+      <th class="c-ex">ประโยคตัวอย่าง</th>
+      ${vocabCat === '*' ? '<th class="c-cat"><button data-sort="cat">หมวด</button></th>' : ''}
+      <th class="c-done"><button data-sort="learned">จำได้</button></th>
+      <th class="c-act"><span class="sr">แก้ไข</span></th>
+    </tr></thead><tbody></tbody></table></div>`);
   const draw = () => {
     const q = vocabQ.toLowerCase();
-    const list = all.filter(w => !q || (w.word + ' ' + w.meaning).toLowerCase().includes(q));
-    const vl = $('.vlist', book); vl.innerHTML = '';
-    if(!list.length) vl.append(h('<p class="muted">ไม่พบคำที่ค้นหา</p>'));
+    const list = all.filter(w => !q || (w.word + ' ' + w.meaning + ' ' + (w.example || '')).toLowerCase().includes(q));
+    if(vocabSort.key){
+      const k = vocabSort.key, d = vocabSort.dir;
+      list.sort((a, b) => k === 'learned' ? (!!a.learned - !!b.learned) * d : String(a[k] || '').localeCompare(String(b[k] || ''), 'th', {sensitivity:'base'}) * d);
+    }
+    $$('th button', book).forEach(b => { b.dataset.dir = b.dataset.sort === vocabSort.key ? (vocabSort.dir > 0 ? 'asc' : 'desc') : ''; });
+    const tb = $('tbody', book); tb.innerHTML = '';
+    if(!list.length) tb.append(h(`<tr class="none"><td colspan="9">${T('ไม่พบคำที่ค้นหา')}</td></tr>`));
     list.forEach(w => {
-      const row = h(`<div class="vword ${w.learned ? 'learned' : ''} ${w.image ? 'has-img' : ''}">
-        ${w.image ? `<img class="vimg" src="${w.image}" alt="">` : ''}
-        <div class="w">${esc(w.word)}<small>${esc(w.reading || '')} ${posList(w).map(p => `<span class="pill">${esc(p)}</span>`).join(' ')}${w.cat && vocabCat === '*' ? ` <span class="pill cat">${esc(w.cat)}</span>` : ''}</small></div>
-        <div class="m">${esc(w.meaning)}</div>${w.example ? `<div class="ex">${esc(w.example)}</div>` : ''}
-        <div class="acts"><button class="check ${w.learned ? 'on' : ''}" aria-label="จำได้แล้ว" title="จำได้แล้ว">${ic('check')}</button><button class="icon-btn" aria-label="แก้ไข">${ic('edit')}</button></div>
-      </div>`);
-      const [chk, ed] = $$('.acts button', row);
-      chk.onclick = async () => { w.learned = !w.learned; try{ await Store.save('vocab', w); }catch(e){ toast('บันทึกไม่สำเร็จ'); } rerender(); };
-      ed.onclick = () => Vocab.edit(w, every);
+      const row = h(`<tr class="${w.learned ? 'learned' : ''}">
+        <td class="c-img">${w.image ? `<img class="vimg" src="${w.image}" alt="">` : '<span class="vimg none" aria-hidden="true"></span>'}</td>
+        <td class="c-word"><b>${esc(w.word)}</b></td>
+        <td class="c-read">${esc(w.reading || '')}</td>
+        <td class="c-pos">${posList(w).map(p => `<span class="pill">${esc(p)}</span>`).join(' ')}</td>
+        <td class="c-mean">${esc(w.meaning)}</td>
+        <td class="c-ex">${esc(w.example || '')}</td>
+        ${vocabCat === '*' ? `<td class="c-cat">${w.cat ? `<span class="pill cat">${esc(w.cat)}</span>` : ''}</td>` : ''}
+        <td class="c-done"><button class="check ${w.learned ? 'on' : ''}" aria-label="จำได้แล้ว" title="จำได้แล้ว">${ic('check')}</button></td>
+        <td class="c-act"><button class="icon-btn" aria-label="แก้ไข">${ic('edit')}</button></td>
+      </tr>`);
+      $('.check', row).onclick = async () => { w.learned = !w.learned; try{ await Store.save('vocab', w); }catch(e){ toast('บันทึกไม่สำเร็จ'); } rerender(); };
+      $('.c-act button', row).onclick = () => Vocab.edit(w, every);
       if(w.image) $('.vimg', row).onclick = () => viewImage(w.image);
-      vl.append(row);
+      tb.append(row);
     });
   };
+  $$('th button', book).forEach(b => b.onclick = () => {
+    const k = b.dataset.sort;
+    vocabSort = vocabSort.key !== k ? {key:k, dir:1} : vocabSort.dir > 0 ? {key:k, dir:-1} : {key:'', dir:1};
+    draw();
+  });
   $('input', tools).oninput = e => { vocabQ = e.target.value; draw(); };
   draw();
   el.append(tools, book);
@@ -131,4 +157,4 @@ function practice(el, all){
 Object.assign(DICT, {'หมวดหมู่':'Category', 'หมวดใหม่':'New category', 'หมวดหมู่ใหม่':'New category', 'ชื่อหมวด':'Category name', 'สร้างหมวด':'Create', 'จัดการหมวด':'Edit category', 'จัดการหมวดนี้':'Edit this category',
   'ไม่มีหมวด':'No category', 'ทั้งหมด':'All', 'รูปประกอบ':'Picture', 'รูปช่วยจำ ระบบย่อขนาดให้อัตโนมัติ':'A picture to help you remember; resized automatically',
   'ชนิดของคำ (part of speech) เลือกได้หลายอย่าง':'Part of speech (pick any)', 'เพิ่มชนิดคำเอง เช่น modal verb':'Add your own, e.g. modal verb', 'สร้างหมวดใหม่ เช่น อาหาร':'New category, e.g. Food',
-  'เพิ่มคำศัพท์':'Add word', 'แก้ไขคำศัพท์':'Edit word', 'หมวดนี้ยังว่าง จดคำแรกของหมวดนี้เลย':'This category is empty. Add its first word.'});
+  'เพิ่มคำศัพท์':'Add word', 'คำอ่าน':'Reading', 'ชนิดคำ':'Part of speech', 'หมวด':'Category', 'จำได้':'Learned', 'รูป':'Picture', 'แก้ไขคำศัพท์':'Edit word', 'หมวดนี้ยังว่าง จดคำแรกของหมวดนี้เลย':'This category is empty. Add its first word.'});
