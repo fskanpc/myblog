@@ -1,0 +1,129 @@
+/* My Little Bubble — "serenesky diaries" theme
+   Pastel checkerboard, paper cards with soft offset shadows, pill headings,
+   dashed pill buttons, scalloped edges and the serenesky line-art logo.
+   Loaded after the page styles so it re-skins every page; folder patterns are untouched. */
+:root{
+  --th-cream:#FFF8EC; --th-check:#E6EEF9; --th-pink:#F9CFDC; --th-pink-d:#F08FAE; --th-coral:#EE7F6B;
+  --th-butter:#FBEAA8; --th-sky:#D6E6FA; --th-sky-d:#9DBBEA; --th-mint:#D4EBC9; --th-lilac:#E1D6F7; --th-tan:#D1A578;
+  --ink:#3D4A8B; --ink-soft:#6B73A6; --ink-faint:#A3A8CB;
+  --glass:#FFFDF8; --glass-strong:#FFFFFF; --glass-border:#F5C6D5; --glass-hi:rgba(255,255,255,.9);
+  --field:#FFFFFF; --field-border:#F1CBD8; --paper:#FFFDF8; --paper-line:#DCE6FF; --paper-margin:#FFB3C8;
+  --shadow:0 6px 0 rgba(241,165,190,.38),0 20px 34px -22px rgba(61,74,139,.45);
+  --shadow-sm:0 3px 0 rgba(241,165,190,.38),0 10px 18px -12px rgba(61,74,139,.35);
+  --logo-c:#3D4A8B;
+  --display:"Fraunces","Mali","IBM Plex Sans Thai Looped",system-ui,serif;
+  --r-panel:30px; --r-card:22px; --r-btn:999px;
+  --hm-bg:var(--th-cream); --hm-card:#FFFDF8; --hm-edge:#FFFFFF; --hm-line:#F5C6D5; --hm-berry:#E0648F; --hm-brown:#5A4A6E;
+  --hm-board:#FFF4D2; --hm-cast:0 6px 0 rgba(241,165,190,.38),0 22px 40px -26px rgba(61,74,139,.5);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --th-cream:#1F2342; --th-check:#252A4F; --th-pink:#5A3A62; --th-sky:#2D3A66; --th-butter:#4A4232; --th-mint:#2E4A3C; --th-lilac:#3C3566;
+    --ink:#EFEBFF; --ink-soft:#C3BCE6; --ink-faint:#8F89B8;
+    --glass:#2A2F57; --glass-strong:#323868; --glass-border:#4E5590; --glass-hi:rgba(255,255,255,.12);
+    --field:#262B50; --field-border:#4E5590; --paper:#2A2F57;
+    --shadow:0 6px 0 rgba(12,14,36,.55),0 20px 34px -22px rgba(0,0,0,.6); --shadow-sm:0 3px 0 rgba(12,14,36,.55),0 10px 18px -12px rgba(0,0,0,.5);
+    --logo-c:#DCD6FF;
+    --hm-bg:var(--th-cream); --hm-card:#2A2F57; --hm-edge:#3A4078; --hm-line:#5A5F98; --hm-berry:#FF9DC0; --hm-brown:#EFE6FF; --hm-board:#2C2A4A;
+    --hm-cast:0 6px 0 rgba(12,14,36,.55),0 22px 40px -26px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --th-cream:#1F2342; --th-check:#252A4F; --th-pink:#5A3A62; --th-sky:#2D3A66; --th-butter:#4A4232; --th-mint:#2E4A3C; --th-lilac:#3C3566;
+  --ink:#EFEBFF; --ink-soft:#C3BCE6; --ink-faint:#8F89B8;
+  --glass:#2A2F57; --glass-strong:#323868; --glass-border:#4E5590; --glass-hi:rgba(255,255,255,.12);
+  --field:#262B50; --field-border:#4E5590; --paper:#2A2F57;
+  --shadow:0 6px 0 rgba(12,14,36,.55),0 20px 34px -22px rgba(0,0,0,.6); --shadow-sm:0 3px 0 rgba(12,14,36,.55),0 10px 18px -12px rgba(0,0,0,.5);
+  --logo-c:#DCD6FF;
+  --hm-bg:var(--th-cream); --hm-card:#2A2F57; --hm-edge:#3A4078; --hm-line:#5A5F98; --hm-berry:#FF9DC0; --hm-brown:#EFE6FF; --hm-board:#2C2A4A;
+  --hm-cast:0 6px 0 rgba(12,14,36,.55),0 22px 40px -26px rgba(0,0,0,.7);
+}
+
+/* ---------- page background: pastel checkerboard ---------- */
+body,body[data-route="home"]{background:var(--th-cream)}
+.sky,body[data-route="home"] .sky{background:repeating-conic-gradient(var(--th-check) 0 25%,var(--th-cream) 0 50%) 0 0/72px 72px}
+.blob{display:none}
+body[data-route="tarot"] .blob{display:block}
+
+/* ---------- paper cards instead of frosted glass ---------- */
+.glass{background:var(--glass);-webkit-backdrop-filter:none;backdrop-filter:none;border:2px solid var(--glass-border);box-shadow:var(--shadow)}
+.glass.shine::before{background:radial-gradient(300px circle at var(--mx,50%) var(--my,-30%),rgba(255,255,255,.55),transparent 50%)}
+.modal{background:var(--glass)}
+.modal-back{background:rgba(61,74,139,.25)}
+
+/* ---------- top bar with the serenesky wordmark ---------- */
+.topbar{border-radius:999px;padding:6px 8px 6px 18px;background:var(--glass);border:2px solid var(--glass-border);box-shadow:var(--shadow-sm)}
+.tb-brand{gap:0}
+.topbar .tb-brand .tb-logo{display:block;width:136px;height:54px;background:var(--logo-c);-webkit-mask:url('../img/logo-serenesky-word.png') center/contain no-repeat;mask:url('../img/logo-serenesky-word.png') center/contain no-repeat;transition:transform .3s cubic-bezier(.2,1.4,.4,1)}
+.tb-brand:hover .tb-logo{transform:rotate(-3deg) scale(1.04)}
+.tb-home{background:var(--th-pink);color:var(--ink);box-shadow:0 3px 0 rgba(224,100,143,.35);outline:2px dashed rgba(255,255,255,.85);outline-offset:-5px;padding:8px 16px}
+.icon-btn{border-radius:50%;color:var(--ink)}
+.icon-btn:hover{background:var(--th-sky)}
+@media (max-width:860px){.topbar .tb-brand .tb-logo{display:block;width:104px;height:42px}.topbar{padding-left:14px}}
+
+/* ---------- headings as pastel pills with a flower sticker ---------- */
+h1,h2,h3{font-family:var(--display)}
+.page-head h1{position:relative;display:inline-block;padding:4px 26px 8px;border-radius:999px;background:var(--pill,var(--th-pink));color:var(--ink);font-size:clamp(26px,3.4vw,38px);font-weight:700;letter-spacing:-.01em;box-shadow:0 4px 0 rgba(61,74,139,.12)}
+.page-head h1::after{content:"";position:absolute;right:-16px;top:-16px;width:36px;height:36px;background:url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"%3E%3Cg fill="%23F7A7BE" stroke="%23fff" stroke-width="2"%3E%3Ccircle cx="20" cy="9" r="8"/%3E%3Ccircle cx="31" cy="17" r="8"/%3E%3Ccircle cx="27" cy="30" r="8"/%3E%3Ccircle cx="13" cy="30" r="8"/%3E%3Ccircle cx="9" cy="17" r="8"/%3E%3C/g%3E%3Ccircle cx="20" cy="21" r="6" fill="%23FFE38C"/%3E%3C/svg%3E') center/contain no-repeat;animation:spinSlow 14s linear infinite}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+.page-head p{margin-top:10px;color:var(--ink-soft)}
+body[data-route="diary"]{--pill:#F9CFDC} body[data-route="books"]{--pill:#FFE0C4} body[data-route="tarot"]{--pill:#E1D6F7}
+body[data-route="travel"]{--pill:#D6E6FA} body[data-route="screen"]{--pill:#FFD3D8} body[data-route="music"]{--pill:#CFEEDF}
+body[data-route="vocab"]{--pill:#FBEAA8} body[data-route="planner"]{--pill:#D9E0FC} body[data-route="profile"]{--pill:#F6DDB0}
+body[data-route="photobooth"]{--pill:#FFD0DC} body[data-route="game"]{--pill:#FFD7E4}
+body[data-route="tarot"] .page-head h1{color:#3D3466}
+
+/* ---------- buttons, chips and fields ---------- */
+.btn{border-radius:999px;background:var(--th-pink-d);color:#fff;box-shadow:0 4px 0 #D06F8F;outline:2px dashed rgba(255,255,255,.8);outline-offset:-6px;padding:11px 22px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #D06F8F}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #D06F8F}
+.btn.soft{background:var(--th-sky);color:var(--ink);box-shadow:0 4px 0 var(--th-sky-d);outline-color:rgba(61,74,139,.3)}
+.btn.danger{background:#FFE3E8;color:#C23A5B;box-shadow:0 4px 0 #F0B6C3;outline-color:rgba(194,58,91,.3)}
+.btn.danger.armed{background:#E8456E;color:#fff}
+.chip{background:var(--glass);border:2px dashed var(--glass-border);color:var(--ink-soft);-webkit-backdrop-filter:none;backdrop-filter:none}
+.chip.on{background:var(--th-pink);border-style:solid;border-color:var(--th-pink);color:var(--ink)}
+.opt.on{background:var(--th-pink);color:var(--ink);border-color:var(--th-pink)}
+.pill{background:var(--th-butter);color:var(--ink)}
+.field input,.field textarea{border-width:2px;border-radius:16px}
+.field input:focus,.field textarea:focus{border-color:var(--th-pink-d);box-shadow:0 0 0 4px rgba(240,143,174,.2)}
+.empty .em-orb{background:var(--th-pink);box-shadow:0 4px 0 rgba(224,100,143,.3)}
+.empty .em-orb svg{color:#fff}
+.toast{background:var(--glass);border:2px solid var(--glass-border)}
+
+/* ---------- sign-in: the full serenesky logo ---------- */
+.auth .brand-orb{width:170px;height:145px;border-radius:0;box-shadow:none;background:var(--logo-c);-webkit-mask:url('../img/logo-serenesky.png') center/contain no-repeat;mask:url('../img/logo-serenesky.png') center/contain no-repeat;animation:none}
+
+/* ---------- footer with a scalloped top ---------- */
+.site-foot{position:relative;margin-top:40px;padding:46px 20px 40px;text-align:center;background:var(--th-pink);color:var(--ink)}
+.site-foot::before{content:"";position:absolute;left:0;right:0;top:-17px;height:18px;background:radial-gradient(circle at 18px 18px,var(--th-pink) 0 17.5px,transparent 18px) 0 0/36px 36px repeat-x}
+.site-foot::after{content:"";position:absolute;left:0;right:0;bottom:0;height:14px;background:var(--th-sky)}
+.sf-logo{display:block;width:210px;height:178px;margin:0 auto;background:var(--logo-c);-webkit-mask:url('../img/logo-serenesky.png') center/contain no-repeat;mask:url('../img/logo-serenesky.png') center/contain no-repeat}
+.sf-tag{margin:8px 0 0;font-family:var(--display);font-size:14px;color:var(--ink-soft)}
+main{padding-bottom:40px}
+@media (max-width:860px){main{padding-bottom:30px}}
+
+/* ---------- home ---------- */
+.hm-title{display:inline-flex;padding:4px 20px 6px;border-radius:999px;background:var(--pill,var(--th-pink));color:var(--ink);font-weight:700;box-shadow:0 4px 0 rgba(61,74,139,.1)}
+.hm-title::after{display:none}
+.hm-cols > div:first-child .hm-title{--pill:var(--th-sky)}
+.hm-arcade .hm-title{--pill:var(--th-pink)}
+.hm-board{background:linear-gradient(rgba(240,150,170,.22) 1.5px,transparent 1.5px) 0 0/30px 30px,linear-gradient(90deg,rgba(240,150,170,.22) 1.5px,transparent 1.5px) 0 0/30px 30px,var(--hm-board)}
+.hm-board::after{content:"";position:absolute;left:30px;right:30px;bottom:-11px;height:22px;background:radial-gradient(circle at 11px 11px,var(--hm-board) 0 10px,transparent 10.5px) 0 0/22px 22px repeat-x}
+.fold-name{color:var(--ink);font-family:var(--display)}
+.hm-card{background:var(--hm-card);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:var(--hm-cast),inset 0 0 0 7px var(--hm-card),inset 0 0 0 9px var(--hm-line)}
+.hm-name{color:var(--hm-berry)}
+.hm-date{background:var(--th-butter);color:var(--ink)}
+.hm-chip{background:var(--glass);border:2px dashed var(--glass-border);box-shadow:none}
+.hm-type{background:var(--th-cream)}
+.hm-scene{border:3px solid var(--glass-border);box-shadow:var(--hm-cast)}
+
+/* scrolling ribbon between the banner and the folders */
+.hm-ribbon{position:relative;margin:-14px -6px 50px;padding:9px 0;overflow:hidden;background:var(--th-sky);border-block:2px dashed rgba(255,255,255,.9);transform:rotate(-1.2deg);box-shadow:0 4px 0 rgba(61,74,139,.1)}
+.hm-ribbon div{display:flex;width:max-content;animation:ribbon 30s linear infinite}
+.hm-ribbon span{padding:0 18px;font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.12em;color:var(--ink);white-space:nowrap}
+.hm-ribbon i{font-style:normal;color:var(--th-pink-d)}
+@keyframes ribbon{to{transform:translateX(-50%)}}
+
+/* ---------- photobooth & claw machine cards follow the paper look ---------- */
+.cm-card{border-radius:24px}
+.pb-board{border:2px solid var(--glass-border)}

@@ -110,6 +110,7 @@ VIEWS.home = async el => {
         </div>
       </div>
     </section>
+    <div class="hm-ribbon" aria-hidden="true"><div>${Array(2).fill(Array(6).fill('<span>SERENESKY DIARIES <i>✿</i></span><span>MY LITTLE BUBBLE <i>❀</i></span>').join('')).join('')}</div></div>
     <section class="hm-board" id="folders">
       <div class="hm-cols">
         <div>
