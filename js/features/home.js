@@ -112,15 +112,11 @@ VIEWS.home = async el => {
     </section>
     <div class="hm-ribbon" aria-hidden="true"><div>${Array(2).fill(Array(6).fill('<span>SERENESKY DIARIES <i>✿</i></span><span>MY LITTLE BUBBLE <i>❀</i></span>').join('')).join('')}</div></div>
     <section class="hm-board" id="folders">
-      <div class="hm-cols">
-        <div>
-          <h2 class="hm-title">แฟ้มของฉัน</h2>
-          <nav class="folds" aria-label="แฟ้มทั้งหมด"></nav>
-        </div>
-        <div class="hm-arcade">
-          <h2 class="hm-title">ตู้คีบตุ๊กตา</h2>
-        </div>
-      </div>
+      <h2 class="hm-title">แฟ้มของฉัน</h2>
+      <nav class="folds" aria-label="แฟ้มทั้งหมด"></nav>
+    </section>
+    <section class="hm-arcade" aria-label="ตู้คีบตุ๊กตา">
+      <h2 class="hm-title">ตู้คีบตุ๊กตา</h2>
     </section>
   </div>`);
   const hero = $('.meadow', page);
@@ -145,7 +141,7 @@ VIEWS.home = async el => {
     });
     folds.append(f);
   });
-  $('.hm-arcade', page).append(clawMachine({compact:true}));
+  $('.hm-arcade', page).append(clawMachine());
   el.append(page);
 
   /* greeting messages typed into the card */
