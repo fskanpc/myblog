@@ -1,5 +1,5 @@
 /* =========================================================
-   HOME: greeting card, train banner with a weather widget, folders, claw machine
+   HOME: greeting card, picnic banner with weather moods, folders, claw machine
    ========================================================= */
 const FOLDER_THEME = {
   diary:  {bg:'#FFDCE8', ink:'#E47AA3', tab:'#F8C3D6'},
@@ -50,6 +50,14 @@ const HM_STK = {
   flower:'<svg viewBox="0 0 40 40"><g fill="#FFC6A8" stroke="#F09A6E" stroke-width="1.8"><circle cx="20" cy="9" r="7"/><circle cx="31" cy="17" r="7"/><circle cx="27" cy="30" r="7"/><circle cx="13" cy="30" r="7"/><circle cx="9" cy="17" r="7"/></g><circle cx="20" cy="21" r="6" fill="#FFE38C" stroke="#E9A93A" stroke-width="1.8"/></svg>',
   bow:'<svg viewBox="0 0 48 32"><path d="M24 16C16 4 4 4 4 14s12 10 20 2zM24 16c8-12 20-12 20-2s-12 10-20 2z" fill="#FF9DBE" stroke="#E0648F" stroke-width="2" stroke-linejoin="round"/><path d="M21 17l-5 12M27 17l5 12" stroke="#E0648F" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="16" r="4" fill="#FFB8CF" stroke="#E0648F" stroke-width="2"/></svg>'
 };
+/* parts of the picnic picture that gently bob (centre x/y and radius in % of the picture, amplitude px, duration, delay) */
+const PC_BOB = [
+  [37.4, 57, 11, 19, 2.2, 3.4, 0], [59.5, 57.5, 10.6, 18.5, 2.2, 3.6, -1.2],          // the two children
+  [49, 67.5, 5, 8, 3, 1.8, -.4],                                                        // chicks on the blanket
+  [33.8, 42.6, 3.6, 4.6, 3, 2.2, -.9], [19.7, 62.5, 3.2, 4.6, 2.5, 2.6, -1.6], [14.3, 83.8, 3.2, 4.6, 2.5, 2.4, -.3],   // chicks on head / left
+  [27.8, 75.5, 6.4, 8.4, 2, 2.8, -2], [69, 72, 6.4, 7.6, 2, 3, -.6], [90.3, 84.6, 5.2, 5.8, 2.6, 2.1, -1.1],            // cats and bunny
+  [8, 17.5, 4, 5.6, 2, 2.6, -.5], [83.4, 18.5, 3.8, 5.4, 2, 2.9, -1.4], [91.2, 31, 3.6, 5, 2, 2.5, -2.1], [66.8, 15, 3, 4.4, 2, 2.3, -.8]  // chicks in the trees
+];
 const HM_DECO = [
   ['star', '-1%', '2%', 54, -12, 6], ['bow', '44%', '-1%', 50, 8, 7, 'hide-sm'], ['sparkle', '97%', '4%', 36, 0, 5],
   ['heart', '.5%', '46%', 40, -10, 6.5, 'hide-sm'], ['smile', '96%', '44%', 46, 12, 7],
@@ -95,7 +103,16 @@ VIEWS.home = async el => {
         </div>
       </div>
       <div class="hm-scene meadow">
-        ${trainScene()}
+        <div class="pc-stage">
+          <img class="pc-photo" src="img/picnic.jpg" alt="ปิกนิกใต้ต้นซากุระ" decoding="async">
+          <div class="pc-sky"><img src="img/picnic-sky.jpg" alt="" decoding="async"></div>
+          <div class="pc-tree l"></div><div class="pc-tree r"></div>
+          ${PC_BOB.map(([x, y, rx, ry, amp, d, dl]) => `<div class="pc-bob" style="--x:${x}%;--y:${y}%;--rx:${rx}%;--ry:${ry}%;--a:${amp}px;--d:${d}s;--dl:${dl}s"></div>`).join('')}
+          <div class="pc-shade"></div>
+          <div class="pc-night" aria-hidden="true"><span class="pc-moon"></span><span class="pc-stars"></span></div>
+          <div class="pc-petals" aria-hidden="true"></div>
+          <div class="pc-snow" aria-hidden="true"></div>
+        </div>
         <div class="md-tint"></div>
         <canvas class="md-rain" aria-hidden="true"></canvas>
         <div class="md-flash"></div>
@@ -106,7 +123,7 @@ VIEWS.home = async el => {
           <span class="wx-hl"></span>
         </div>
         <div class="wx-modes" role="radiogroup" aria-label="โหมดสภาพอากาศ">
-          <button data-m="auto" role="radio">อัตโนมัติ</button><button data-m="sun" role="radio">☀️ แดด</button><button data-m="rain" role="radio">🌧️ ฝน</button><button data-m="night" role="radio">🌙 กลางคืน</button>
+          <button data-m="auto" role="radio">อัตโนมัติ</button><button data-m="sun" role="radio">☀️ ร้อน</button><button data-m="rain" role="radio">🌧️ ฝน</button><button data-m="snow" role="radio">❄️ หิมะ</button><button data-m="night" role="radio">🌙 กลางคืน</button>
         </div>
       </div>
     </section>
@@ -121,6 +138,12 @@ VIEWS.home = async el => {
   </div>`);
   const hero = $('.meadow', page);
 
+  /* sakura petals drifting on hot days, snowflakes in winter */
+  const petals = $('.pc-petals', hero), snow = $('.pc-snow', hero);
+  for(let i = 0; i < 18; i++){ const d = 9 + Math.random() * 9; petals.append(h(`<i style="left:${(Math.random() * 100).toFixed(1)}%;--s:${(7 + Math.random() * 7).toFixed(0)}px;--d:${d.toFixed(1)}s;--dl:${(-Math.random() * d).toFixed(1)}s;--x:${(40 + Math.random() * 90).toFixed(0)}px"></i>`)); }
+  const stars = $('.pc-stars', hero);
+  for(let i = 0; i < 34; i++){ const sp = i < 6; stars.append(h(`<i class="${sp ? 'sp' : ''}" style="left:${(31 + Math.random() * 36).toFixed(1)}%;top:${(10 + Math.random() * 28).toFixed(1)}%;--ss:${sp ? (9 + Math.random() * 6).toFixed(0) : (1.6 + Math.random() * 1.8).toFixed(1)}px;animation-delay:${(-Math.random() * 4).toFixed(1)}s;animation-duration:${(1.8 + Math.random() * 2.6).toFixed(1)}s"></i>`)); }
+  for(let i = 0; i < 70; i++){ const d = 7 + Math.random() * 9; snow.append(h(`<i style="left:${(Math.random() * 100).toFixed(1)}%;--s:${(3 + Math.random() * 6).toFixed(1)}px;--d:${d.toFixed(1)}s;--dl:${(-Math.random() * d).toFixed(1)}s;--x:${(-30 + Math.random() * 60).toFixed(0)}px;opacity:${(.6 + Math.random() * .4).toFixed(2)}"></i>`)); }
   const deco = $('.hm-deco', page);
   HM_DECO.forEach(([k, x, y, s, r, d, cls]) => deco.append(h(`<span class="hm-stk ${cls || ''}" style="left:${x};top:${y};--s:${s}px;--r:${r}deg;--d:${d}s">${HM_STK[k]}</span>`)));
 
@@ -156,7 +179,10 @@ VIEWS.home = async el => {
     if(mode === 'sun'){ kind = 'clear'; day = true; }
     if(mode === 'rain'){ kind = 'rain'; }
     if(mode === 'night'){ kind = 'clear'; day = false; }
-    hero.dataset.wx = kind; hero.dataset.day = day ? '1' : '0';
+    // Thai seasons: rain follows the real weather; otherwise the cool season (Nov–Feb, or a cold day) snows and the rest is hot
+    const winter = [10, 11, 0, 1].includes(now.getMonth()) || (wx && wx.temp <= 20);
+    const mood = mode === 'snow' ? 'snow' : mode === 'sun' ? 'hot' : mode === 'rain' || kind === 'rain' || kind === 'storm' ? 'rain' : mode === 'auto' && winter ? 'snow' : 'hot';
+    hero.dataset.wx = kind; hero.dataset.day = day ? '1' : '0'; hero.dataset.mood = mood;
     const icon = day || kind !== 'clear' ? Weather.icon(kind) : '🌙';
     $('.md-weather .wi', page).textContent = icon;
     // temperature and place stay real; the preview modes only change the sky
@@ -171,7 +197,9 @@ VIEWS.home = async el => {
     msgs.length = 0;
     msgs.push(`${T(hello)} ${name}`);
     if(wx && mode === 'auto') msgs.push(LANG === 'en' ? `It's ${wx.temp}° and ${T(Weather.label(wx.kind)).toLowerCase()}${wx.place ? ' in ' + wx.place : ''}` : `ตอนนี้ ${wx.temp}° ${Weather.label(wx.kind)}${wx.place ? 'ที่' + wx.place : ''}`);
-    if(kind === 'rain' || kind === 'storm') msgs.push(T('ฝนตกอยู่ พกร่มด้วยนะ'));
+    if(mood === 'snow') msgs.push(T('หน้าหนาวแล้ว ใส่เสื้อกันหนาวด้วยนะ'));
+    else if(kind === 'rain' || kind === 'storm' || mood === 'rain') msgs.push(T('ฝนตกอยู่ พกร่มด้วยนะ'));
+    else if(day && wx && wx.temp >= 33) msgs.push(T('อากาศร้อนมาก ดื่มน้ำเยอะ ๆ นะ'));
     else if(day) msgs.push(T('วันนี้อากาศดี ออกไปเดินเล่นกัน'));
     else msgs.push(T('ดึกแล้ว พักผ่อนเยอะ ๆ นะ'));
     if(todayTasks.length) msgs.push(LANG === 'en' ? `${left.length} of ${todayTasks.length} tasks left today` : `วันนี้เหลืออีก ${left.length} จาก ${todayTasks.length} งาน`);
@@ -191,7 +219,7 @@ VIEWS.home = async el => {
   });
 };
 
-Object.assign(DICT, {'หน้าต่างวันนี้':'Today’s window', 'เขียนบันทึกวันนี้':'Write today’s entry', 'เปลี่ยนโหมดสภาพอากาศ':'Change weather mode', 'สภาพอากาศวันนี้':'Today’s weather', 'โหมดสภาพอากาศ':'Weather mode', 'แดด':'Sunny', 'ฝน':'Rain', 'กลางคืน':'Night', 'โหมดกลางคืน':'Night mode', 'เปลี่ยนเป็นกลางคืน':'Switched to night'});
+Object.assign(DICT, {'หน้าต่างวันนี้':'Today’s window', 'เขียนบันทึกวันนี้':'Write today’s entry', 'เปลี่ยนโหมดสภาพอากาศ':'Change weather mode', 'สภาพอากาศวันนี้':'Today’s weather', 'ร้อน':'Hot', 'หิมะ':'Snow', 'ปิกนิกใต้ต้นซากุระ':'Picnic under the cherry trees', 'หน้าหนาวแล้ว ใส่เสื้อกันหนาวด้วยนะ':'It’s the cool season, wrap up warm', 'อากาศร้อนมาก ดื่มน้ำเยอะ ๆ นะ':'It’s really hot, drink plenty of water', 'โหมดสภาพอากาศ':'Weather mode', 'แดด':'Sunny', 'ฝน':'Rain', 'กลางคืน':'Night', 'โหมดกลางคืน':'Night mode', 'เปลี่ยนเป็นกลางคืน':'Switched to night'});
 
 /* typewriter that understands Thai combining marks */
 function typeLoop(el, msgs){
