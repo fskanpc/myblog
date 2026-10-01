@@ -15,7 +15,8 @@ VIEWS.vocab = async el => {
   const learned = all.filter(w => w.learned).length;
   el.append(pageHead('สมุดคำศัพท์', all.length ? `${all.length} คำ จำได้แล้ว ${learned} คำ` : 'จดไว้ ท่องทุกวัน', 'จดคำใหม่', () => Vocab.add()));
   el.append(chips([['book','สมุดจด'], ['practice','โหมดท่อง']], vocabMode, v => { vocabMode = v; vocabDeck = null; rerender(); }));
-  if(!all.length) return el.append(emptyState('vocab', 'สมุดยังว่าง จดคำศัพท์คำแรกเลย', 'จดคำใหม่', () => Vocab.add()));
+  const importBtn = () => { const b = h(`<button class="btn soft vi-open">${ic('plus')}<span>นำเข้าจาก PDF</span></button>`); b.onclick = () => vocabImport(all); return b; };
+  if(!all.length){ const e = emptyState('vocab', 'สมุดยังว่าง จดคำศัพท์คำแรกเลย', 'จดคำใหม่', () => Vocab.add()); e.append(' ', importBtn()); return el.append(e); }
   if(vocabMode === 'practice') return practice(el, all);
   const tools = h(`<div class="vtools"><input type="search" placeholder="ค้นหาคำหรือความหมาย" aria-label="ค้นหาคำศัพท์" value="${escT(vocabQ)}"></div>`);
   const book = h('<div class="notebook"><div class="rings" aria-hidden="true">' + '<i></i>'.repeat(6) + '</div><div class="vlist"></div></div>');
@@ -36,6 +37,7 @@ VIEWS.vocab = async el => {
       vl.append(row);
     });
   };
+  tools.append(importBtn());
   $('input', tools).oninput = e => { vocabQ = e.target.value; draw(); };
   draw();
   el.append(tools, book);

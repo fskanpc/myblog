@@ -28,3 +28,36 @@
 .flash .hint{font-size:13.5px;color:var(--ink-faint);position:absolute;bottom:18px}
 .flash .fm{font-size:22px;font-weight:600}
 .flash-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- import from PDF ---------- */
+.vi{display:grid;gap:14px}
+.vi-drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:26px 18px;border-radius:20px;border:2.5px dashed var(--glass-border);background:var(--field);text-align:center;cursor:pointer;transition:background .2s,border-color .2s}
+.vi-drop:hover,.vi-drop.over{border-color:var(--pink);background:rgba(255,143,181,.08)}
+.vi-ic{font-size:34px;line-height:1}
+.vi-drop b{font-size:16px}
+.vi-drop small{color:var(--ink-soft);font-size:12.5px}
+.vi.busy .vi-drop{pointer-events:none;opacity:.6}
+.vi.busy .vi-status::before{content:"";display:inline-block;width:14px;height:14px;margin-right:8px;vertical-align:-2px;border-radius:50%;border:2.5px solid var(--pink);border-top-color:transparent;animation:viSpin .8s linear infinite}
+@keyframes viSpin{to{transform:rotate(360deg)}}
+.vi-paste summary{cursor:pointer;color:var(--ink-soft);font-weight:600;font-size:14px}
+.vi-paste textarea{width:100%;margin:10px 0 8px;padding:10px 14px;border-radius:14px;border:2px solid var(--field-border);background:var(--field);font:inherit;resize:vertical}
+.vi-ocr{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 14px;border-radius:16px;background:var(--th-butter,#FFF3C8);font-size:14px}
+.vi-ocr > span{font-weight:600}
+.vi-ocr label{display:inline-flex;align-items:center;gap:5px}
+.vi-ocr .btn{margin-left:auto}
+.vi-status{margin:0;min-height:1.4em;font-size:14px}
+.vi-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:14px}
+.vi-all{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.vi-sum{color:var(--ink-soft)}
+.vi-table{display:grid;gap:6px;max-height:46vh;overflow:auto;padding-right:4px}
+.vi-row{display:grid;grid-template-columns:auto minmax(0,1fr) 84px minmax(0,1.4fr) auto;gap:6px 8px;align-items:center;padding:6px 8px;border-radius:12px;background:var(--field);border:1.5px solid var(--field-border)}
+.vi-row.dup{opacity:.6}
+.vi-row input:not([type=checkbox]),.vi-row select{width:100%;padding:6px 10px;border-radius:10px;border:1.5px solid var(--field-border);background:transparent;font:inherit;font-size:14px;color:inherit;min-width:0}
+.vi-w{font-weight:600}
+.vi-tag{padding:2px 8px;border-radius:999px;background:var(--th-sky,#D6E6FA);font-size:11.5px;white-space:nowrap}
+.vi-tag.warn{background:#FFE3E8;color:#C23A5B}
+.vi-more{grid-column:2/-1;color:var(--ink-soft);font-size:12.5px;font-style:italic}
+.vi-row input[type=checkbox],.vi-all input,.vi-ocr input{width:18px;height:18px;accent-color:var(--th-pink-d,#F08FAE)}
+@media (max-width:640px){.vi-row{grid-template-columns:auto minmax(0,1fr) 76px}.vi-m{grid-column:2/-1}.vi-tag{grid-column:2/-1;justify-self:start}}
+.vi-ocr-note{flex-basis:100%;margin:0;font-size:13.5px;line-height:1.55}
+.vi-ocr[hidden],.vi-result[hidden]{display:none}
