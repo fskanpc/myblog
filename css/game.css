@@ -1,67 +1,44 @@
-/* My Little Bubble — claw machine game */
-.cm-wrap{display:grid;grid-template-columns:minmax(0,470px) minmax(0,1fr);gap:28px;align-items:start;justify-content:center}
-@media (max-width:900px){.cm-wrap{grid-template-columns:1fr}}
-.claw-machine{position:relative;width:100%;max-width:470px;margin:0 auto;padding:20px 20px 18px;border-radius:30px;
-  background:radial-gradient(circle,#FFF3B0 0 4px,transparent 4.6px) 0 0/22px 22px,radial-gradient(circle,#FF9DBE 0 4px,transparent 4.6px) 11px 11px/22px 22px,linear-gradient(180deg,#FF9FBE,#F7839F);
-  box-shadow:0 24px 50px -24px rgba(200,70,110,.6),inset 0 2px 0 rgba(255,255,255,.5),inset 0 -6px 0 rgba(170,50,90,.18);animation:bulbs 1.4s steps(2) infinite}
-.cm-sign{margin:0 0 14px;padding:8px 10px;border-radius:14px;background:#FFF8DD;box-shadow:inset 0 0 0 3px #F6C85F,0 4px 0 rgba(170,60,90,.25);text-align:center}
-.cm-sign span{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,34px);letter-spacing:.12em;color:#FFE38C;-webkit-text-stroke:2px #E9A93A;paint-order:stroke fill;text-shadow:0 2px 0 #E9A93A}
-.cm-window{position:relative;border-radius:20px;overflow:hidden;border:8px solid #F06F90;box-shadow:inset 0 0 0 3px rgba(255,255,255,.5),0 6px 0 rgba(170,50,90,.25);background:#FFEFD9}
-.cm-window canvas{display:block;width:100%;aspect-ratio:360/440;touch-action:none}
-.cm-glass{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.28) 0 12%,transparent 12% 20%,rgba(255,255,255,.18) 20% 24%,transparent 24%)}
-.cm-msg{position:absolute;left:50%;top:14%;transform:translate(-50%,-6px);max-width:86%;padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.9);color:#C94A72;font-weight:600;font-size:15px;text-align:center;box-shadow:0 8px 18px -8px rgba(160,60,90,.5);opacity:0;transition:all .3s;pointer-events:none}
-.cm-msg.show{opacity:1;transform:translate(-50%,0)}
-.cm-panel{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;margin-top:16px;padding:14px 16px;border-radius:20px;background:#FFE3EC;box-shadow:inset 0 2px 6px rgba(200,80,120,.2)}
-.cm-slots{display:flex;align-items:center;gap:6px;padding:6px;border-radius:14px;background:#fff;box-shadow:inset 0 0 0 2px #F4B7C9}
-.slot{width:34px;height:34px;border-radius:50%;background:linear-gradient(180deg,#A9BEF7,#8FA6EE);display:grid;place-items:center;box-shadow:inset 0 2px 0 rgba(255,255,255,.5)}
-.slot i{width:4px;height:18px;border-radius:2px;background:#fff}
-.slot.tilt i{transform:rotate(30deg)}
-.cm-coin{width:42px;height:42px;border-radius:10px;background:linear-gradient(180deg,#A9BEF7,#7F98EA);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;box-shadow:0 3px 0 #5C77D4;transition:transform .15s}
-.cm-coin b{font-size:18px}.cm-coin small{font-size:9px;font-weight:700}
-.cm-coin:active{transform:translateY(3px);box-shadow:none}
-.cm-coin:disabled{filter:grayscale(.7);opacity:.6}
-.cm-coin:not(:disabled){animation:coinPulse 1.6s ease-in-out infinite}
-@keyframes coinPulse{50%{box-shadow:0 3px 0 #5C77D4,0 0 0 6px rgba(143,166,238,.35)}}
-.cm-stick{display:flex;align-items:center;justify-content:center;gap:8px}
-.cm-dir{width:44px;height:44px;border-radius:50%;background:#fff;color:#7F95D8;display:grid;place-items:center;box-shadow:0 3px 0 #D9C3CC;touch-action:none;-webkit-user-select:none;user-select:none}
-.cm-dir:active{transform:translateY(3px);box-shadow:none}
-.cm-dir svg{width:22px;height:22px}
-.cm-knob{position:relative;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 50% 60%,#9FB3F2 0 44%,#7F95D8 45%);display:block;transition:transform .12s}
-.cm-knob i{position:absolute;left:50%;bottom:50%;width:8px;height:30px;margin-left:-4px;border-radius:4px;background:#C8D3F6;transform-origin:50% 100%}
-.cm-knob i::after{content:"";position:absolute;left:50%;top:-14px;width:26px;height:26px;margin-left:-13px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FF9A9A,#E0374F 60%,#B8233A);box-shadow:0 3px 6px rgba(120,20,40,.35)}
-.cm-drop{width:64px;height:64px;border-radius:50%;padding:6px;background:linear-gradient(180deg,#A9BEF7,#7F98EA);box-shadow:0 4px 0 #5C77D4}
-.cm-drop span{display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFA0A0,#E0374F 60%,#B01E36);box-shadow:inset 0 -4px 0 rgba(0,0,0,.18);transition:transform .1s}
-.cm-drop:active span{transform:scale(.9)}
-@media (max-width:420px){.cm-panel{gap:8px;padding:12px 10px}.slot{display:none}.cm-dir{width:40px;height:40px}.cm-drop{width:58px;height:58px}}
-.cm-side{display:grid;gap:18px}
-.cm-card{padding:20px 22px}
-.cm-card h3{font-size:18px;margin-bottom:10px}
-.cm-card p{font-size:14px;line-height:1.7;margin:10px 0 0}
-.cm-coinrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.coin{width:26px;height:26px;border-radius:50%;background:#E8E3EE;box-shadow:inset 0 -3px 0 rgba(0,0,0,.08)}
-.coin.on{background:radial-gradient(circle at 35% 30%,#FFF1A8,#F6C33A 60%,#D99A12);box-shadow:inset 0 -3px 0 rgba(150,90,0,.25),0 2px 6px -2px rgba(200,140,0,.6)}
-.coin-txt{margin-left:6px;font-weight:600;color:var(--ink-soft);font-size:14px}
-.cm-shelf{display:flex;flex-wrap:wrap;gap:10px}
-.prize{position:relative;display:flex;flex-direction:column;align-items:center;padding:8px 10px 6px;border-radius:16px;background:var(--glass-strong);box-shadow:var(--shadow-sm);min-width:78px}
-.prize .pn{position:absolute;top:4px;right:6px;font-size:12px;font-weight:700;color:#E0708F}
-.prize .pl{font-size:12.5px;color:var(--ink-soft)}
-.claw-machine:focus-visible{outline:3px solid #7F95D8;outline-offset:4px;border-radius:30px}
+/* My Little Bubble — claw machine ("Lucky Catch") */
+.cm-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.cm-help{max-width:460px;margin:0;text-align:center;font-size:13.5px;line-height:1.6}
 
-/* compact machine on the home page, next to the folders */
-.cm-wrap.compact{grid-template-columns:1fr;gap:16px}
-.cm-wrap.compact .claw-machine{max-width:none;padding:16px 16px 14px;border-radius:28px;transform:rotate(-1deg)}
-.cm-wrap.compact .cm-sign{margin-bottom:12px}
-.cm-wrap.compact .cm-sign span{font-size:clamp(22px,2.6vw,28px)}
-.cm-wrap.compact .cm-panel{gap:10px;padding:12px}
-.cm-wrap.compact .slot{width:28px;height:28px}
-.cm-wrap.compact .cm-dir{width:40px;height:40px}
-.cm-wrap.compact .cm-knob{width:40px;height:40px}
-.cm-wrap.compact .cm-drop{width:56px;height:56px}
-.cm-wrap.compact .cm-side{gap:12px}
-.cm-wrap.compact .cm-card{padding:14px 18px;border-radius:24px}
-.cm-wrap.compact .cm-card h3{font-size:16px;margin-bottom:8px}
-.cm-wrap.compact .cm-card p{font-size:13px;margin-top:8px}
-.cm-wrap.compact .coin{width:22px;height:22px}
-.cm-wrap.compact .prize{min-width:66px;padding:6px 8px 4px}
-.cm-wrap.compact .prize canvas{width:44px!important;height:44px!important}
-@media (max-width:1180px) and (min-width:1021px){.cm-wrap.compact .slot{display:none}}
+/* outer frame: a strip of marquee bulbs (pink and yellow) around the pink cabinet */
+.claw-machine{position:relative;width:100%;max-width:480px;padding:24px;border-radius:18px;outline:none;
+  background:radial-gradient(circle,#F7808F 0 5.5px,transparent 6px) 0 0/26px 26px,radial-gradient(circle,#FFF09A 0 5.5px,transparent 6px) 13px 13px/26px 26px,#FBC2C8;
+  box-shadow:0 26px 50px -24px rgba(200,70,110,.6),inset 0 0 0 3px rgba(255,255,255,.35)}
+.claw-machine::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,255,255,.9) 0 3px,transparent 4px) 13px 13px/26px 26px;opacity:0;animation:cmBulbs 1.2s steps(2) infinite}
+@keyframes cmBulbs{50%{opacity:.75}}
+.claw-machine:focus-visible{box-shadow:0 0 0 4px #7F95DE,0 26px 50px -24px rgba(200,70,110,.6)}
+.cm-body{position:relative;z-index:1;padding:16px 16px 18px;border-radius:12px;background:#F7A4AD;box-shadow:inset 0 0 0 3px #F08C98,inset 0 -6px 0 rgba(200,70,100,.15)}
+
+.cm-sign{margin:0 0 14px;padding:8px 10px 6px;border-radius:10px;background:#FFF7DA;box-shadow:inset 0 0 0 3px #E79CA2,0 3px 0 rgba(200,80,100,.25);text-align:center}
+.cm-sign span{font-family:"Mali",var(--display);font-weight:700;font-size:clamp(26px,6vw,40px);letter-spacing:.14em;color:#FFE99B;-webkit-text-stroke:2.5px #E2B64F;paint-order:stroke fill;text-shadow:0 2px 0 rgba(226,182,79,.45)}
+
+.cm-window{position:relative;border-radius:14px;overflow:hidden;border:10px solid #EF7484;box-shadow:inset 0 0 0 3px rgba(255,255,255,.45),0 5px 0 rgba(190,60,90,.3);background:#FFE9D8}
+.cm-window canvas{display:block;width:100%;aspect-ratio:380/410;touch-action:none}
+.cm-glass{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.22) 0 10%,transparent 10% 18%,rgba(255,255,255,.14) 18% 21%,transparent 21%)}
+.cm-msg{position:absolute;left:50%;top:13%;transform:translate(-50%,-6px);max-width:86%;padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.92);color:#D9507F;font-weight:600;font-size:15px;text-align:center;box-shadow:0 8px 18px -8px rgba(160,60,90,.5);opacity:0;transition:all .3s;pointer-events:none}
+.cm-msg.show{opacity:1;transform:translate(-50%,0)}
+
+/* control panel: coin slots on the left, joystick and the big red button on the right */
+.cm-panel{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;margin-top:16px;padding:0 4px}
+.cm-slots{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:#FBC9CE;box-shadow:inset 0 0 0 3px #EE8E9A}
+.slot{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#A9BDF5;box-shadow:inset 0 0 0 3px #7F95DE,inset 0 3px 0 rgba(255,255,255,.45)}
+.slot i{width:5px;height:20px;border-radius:3px;background:#7F95DE}
+.slot.tilt i{transform:rotate(28deg)}
+.cm-coin{width:44px;height:46px;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;background:#A9BDF5;color:#fff;box-shadow:inset 0 0 0 3px #7F95DE;font-family:"Mali",var(--display)}
+.cm-coin b{font-size:20px;-webkit-text-stroke:1px #7F95DE}
+.cm-coin small{font-size:10px;font-weight:700;color:#5F78D0}
+
+.cm-stick{position:relative;justify-self:end;width:96px;height:96px}
+.cm-knob{position:absolute;left:50%;bottom:6px;width:62px;height:62px;margin-left:-31px;border-radius:50%;background:radial-gradient(circle at 50% 55%,#BBCBF7 0 40%,#9DB2F0 41%);box-shadow:inset 0 0 0 3px #7F95DE;transform-origin:50% 100%;transition:transform .12s;pointer-events:none}
+.cm-knob i{position:absolute;left:50%;bottom:50%;width:10px;height:42px;margin-left:-5px;border-radius:5px;background:#DCE4FB;box-shadow:inset 0 0 0 2px #9DB2F0}
+.cm-knob i::after{content:"";position:absolute;left:50%;top:-20px;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFC2BC 0 12%,#F26B6B 45%,#D9474F);box-shadow:0 3px 6px rgba(150,30,50,.35)}
+.cm-dir{position:absolute;top:0;bottom:0;width:50%;background:none;border-radius:16px;touch-action:none;-webkit-user-select:none;user-select:none}
+.cm-dir.l{left:0}.cm-dir.r{right:0}
+.cm-dir:focus-visible{outline:3px solid #7F95DE;outline-offset:-3px}
+.cm-drop{width:78px;height:78px;border-radius:50%;padding:7px;background:#A9BDF5;box-shadow:inset 0 0 0 3px #7F95DE,0 4px 0 #6F86D6}
+.cm-drop span{display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFC2BC 0 10%,#F26B6B 45%,#D23F49);box-shadow:inset 0 -4px 0 rgba(0,0,0,.15);transition:transform .1s}
+.cm-drop:active span{transform:scale(.9)}
+@media (max-width:420px){.claw-machine{padding:18px}.cm-body{padding:12px}.cm-panel{gap:8px}.slot{display:none}.cm-stick{width:80px;height:84px}.cm-knob{width:54px;height:54px;margin-left:-27px}.cm-drop{width:64px;height:64px}}

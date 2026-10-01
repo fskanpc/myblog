@@ -1,55 +1,70 @@
 /* =========================================================
-   GAME: claw machine (ตู้คีบตุ๊กตา)
+   GAME: claw machine (ตู้คีบตุ๊กตา) — free play, just for fun
+   machine and plushies follow the owner's own "Lucky Catch" design
    ========================================================= */
 const PLUSH = {
-  bunny: {th:'กระต่าย', body:'#FFC9DA', ear:'#FFC9DA', inner:'#FF9DBE'},
-  bear:  {th:'หมี', body:'#D2A274', ear:'#D2A274', inner:'#F1D2B0'},
-  piggy: {th:'หมูน้อย', body:'#FFB9C9', ear:'#FFA3B9', inner:'#FF8FAA'},
-  chick: {th:'ลูกเจี๊ยบ', body:'#FFE27A', ear:'#FFD24A', inner:'#FFB23A'},
-  lamb:  {th:'แกะ', body:'#FFFFFF', ear:'#F7D6DE', inner:'#F7D6DE'},
-  kitty: {th:'แมว', body:'#E6DEFA', ear:'#E6DEFA', inner:'#FFC4D8'}
+  pigbun:  {th:'กระต่ายหมู', w:4},
+  bear:    {th:'หมีน้ำตาล', w:3},
+  puppy:   {th:'ลูกหมาโบชมพู', w:2, bow:'#F7B6C8', bowLine:'#E58AA4'},
+  puppyRed:{th:'ลูกหมาโบแดง', w:1, bow:'#F2716F', bowLine:'#D14E50'},
+  mini:    {th:'หมีเหลืองจิ๋ว', w:1}
 };
-const PLUSH_TYPES = Object.keys(PLUSH);
-const DAILY_COINS = 5;
-const CM = {W:360, H:440, railY:22, chuteX:98, chuteTop:300, homeX:54};
+const PLUSH_BAG = Object.entries(PLUSH).flatMap(([k, v]) => Array(v.w).fill(k));
+const CM = {W:380, H:410, railY:20, chuteX:100, chuteTop:292, homeX:56};
 /* claw arms: w = how far each arm reaches out sideways */
-const CLAW = {len:44, tip:16, open:40, rest:22, shut:7};
+const CLAW = {len:54, tip:18, open:52, rest:26, shut:8};
 
-function drawPlush(ctx, type, r, ang = 0){
-  const P = PLUSH[type], line = '#9A7589';
-  ctx.save(); ctx.rotate(ang); ctx.lineWidth = Math.max(1.4, r * .07); ctx.strokeStyle = line; ctx.lineJoin = 'round';
-  const fillStroke = () => { ctx.fill(); ctx.stroke(); };
-  ctx.fillStyle = P.ear;
-  if(type === 'bunny'){
-    for(const s of [-1, 1]){ ctx.beginPath(); ctx.ellipse(s * r * .38, -r * 1.05, r * .24, r * .62, s * .18, 0, 7); fillStroke(); ctx.fillStyle = P.inner; ctx.beginPath(); ctx.ellipse(s * r * .38, -r * 1.02, r * .1, r * .4, s * .18, 0, 7); ctx.fill(); ctx.fillStyle = P.ear; }
-  } else if(type === 'bear' || type === 'lamb'){
-    for(const s of [-1, 1]){ ctx.beginPath(); ctx.arc(s * r * .66, -r * .66, r * .3, 0, 7); fillStroke(); ctx.fillStyle = P.inner; ctx.beginPath(); ctx.arc(s * r * .66, -r * .66, r * .15, 0, 7); ctx.fill(); ctx.fillStyle = P.ear; }
-  } else if(type === 'piggy' || type === 'kitty'){
-    for(const s of [-1, 1]){ ctx.beginPath(); ctx.moveTo(s * r * .78, -r * .38); ctx.lineTo(s * r * .62, -r * 1.02); ctx.lineTo(s * r * .18, -r * .78); ctx.closePath(); fillStroke(); }
-  } else if(type === 'chick'){
-    ctx.beginPath(); ctx.moveTo(-r * .1, -r * .92); ctx.quadraticCurveTo(0, -r * 1.35, r * .14, -r * .9); ctx.quadraticCurveTo(r * .3, -r * 1.2, r * .32, -r * .86); fillStroke();
-  }
-  // body
-  ctx.fillStyle = P.body; ctx.beginPath();
-  if(type === 'lamb'){ for(let i = 0; i < 12; i++){ const a = i / 12 * Math.PI * 2; ctx.moveTo(Math.cos(a) * r * .86 + r * .2, Math.sin(a) * r * .86); ctx.arc(Math.cos(a) * r * .86, Math.sin(a) * r * .86, r * .2, 0, 7); } ctx.fill(); ctx.beginPath(); ctx.arc(0, 0, r * .9, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(0, r * .05, r * .62, 0, 7); ctx.fillStyle = '#FFF6EE'; }
-  else ctx.ellipse(0, 0, r, r * .92, 0, 0, 7);
-  fillStroke();
-  // face
-  const ey = type === 'lamb' ? r * .02 : -r * .05;
-  ctx.fillStyle = '#4A3548';
-  for(const s of [-1, 1]){ ctx.beginPath(); ctx.ellipse(s * r * .3, ey, r * .075, r * .1, 0, 0, 7); ctx.fill(); }
-  ctx.fillStyle = 'rgba(255,120,150,.45)';
-  for(const s of [-1, 1]){ ctx.beginPath(); ctx.ellipse(s * r * .5, ey + r * .2, r * .14, r * .09, 0, 0, 7); ctx.fill(); }
-  if(type === 'piggy'){ ctx.fillStyle = P.inner; ctx.beginPath(); ctx.ellipse(0, ey + r * .26, r * .22, r * .15, 0, 0, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#9A5A70'; for(const s of [-1, 1]){ ctx.beginPath(); ctx.arc(s * r * .07, ey + r * .26, r * .035, 0, 7); ctx.fill(); } }
-  else if(type === 'chick'){ ctx.fillStyle = P.inner; ctx.beginPath(); ctx.moveTo(-r * .1, ey + r * .15); ctx.lineTo(r * .1, ey + r * .15); ctx.lineTo(0, ey + r * .3); ctx.closePath(); ctx.fill(); }
-  else if(type === 'bear'){ ctx.fillStyle = P.inner; ctx.beginPath(); ctx.ellipse(0, ey + r * .28, r * .26, r * .19, 0, 0, 7); ctx.fill(); ctx.fillStyle = '#4A3548'; ctx.beginPath(); ctx.ellipse(0, ey + r * .2, r * .07, r * .05, 0, 0, 7); ctx.fill(); }
-  else { ctx.strokeStyle = '#4A3548'; ctx.lineWidth = Math.max(1.2, r * .05); ctx.beginPath(); ctx.moveTo(-r * .1, ey + r * .2); ctx.quadraticCurveTo(-r * .05, ey + r * .28, 0, ey + r * .2); ctx.quadraticCurveTo(r * .05, ey + r * .28, r * .1, ey + r * .2); ctx.stroke(); }
-  if(type === 'kitty'){ ctx.strokeStyle = 'rgba(74,53,72,.5)'; ctx.lineWidth = 1; for(const s of [-1, 1]) for(const k of [0, 1]){ ctx.beginPath(); ctx.moveTo(s * r * .55, ey + r * (.12 + k * .1)); ctx.lineTo(s * r * .9, ey + r * (.06 + k * .16)); ctx.stroke(); } }
-  ctx.restore();
+/* soft shapes: stroke every part first, then fill them all, so only the outer outline shows */
+function puff(c, parts, fill, line, lw){
+  c.lineJoin = 'round'; c.lineWidth = lw * 2; c.strokeStyle = line;
+  for(const p of parts){ c.beginPath(); p(); c.stroke(); }
+  c.fillStyle = fill;
+  for(const p of parts){ c.beginPath(); p(); c.fill(); }
 }
-function plushIcon(type, size = 64){
-  const c = document.createElement('canvas'), d = 2; c.width = c.height = size * d; c.style.width = c.style.height = size + 'px';
-  const x = c.getContext('2d'); x.scale(d, d); x.translate(size / 2, size * .6); drawPlush(x, type, size * .34); return c;
+const ell = (c, x, y, rx, ry, a = 0) => () => c.ellipse(x, y, rx, ry, a, 0, Math.PI * 2);
+function dotEyes(c, r, y, col, size = .06){ c.fillStyle = col; for(const s of [-1, 1]){ c.beginPath(); c.ellipse(s * r * .3, y, r * size, r * size * 1.15, 0, 0, 7); c.fill(); } }
+function blush(c, r, y, col, a = .5, sx = .55){ c.save(); c.globalAlpha = a; c.fillStyle = col; for(const s of [-1, 1]){ c.beginPath(); c.ellipse(s * r * sx, y, r * .17, r * .1, 0, 0, 7); c.fill(); } c.restore(); }
+function bow(c, x, y, s, col, line){
+  c.save(); c.translate(x, y); c.rotate(-.35);
+  puff(c, [() => { c.moveTo(0, 0); c.bezierCurveTo(-s * .9, -s * .9, -s * 1.3, s * .5, 0, 0); }, () => { c.moveTo(0, 0); c.bezierCurveTo(s * .9, -s * .9, s * 1.3, s * .5, 0, 0); }, ell(c, 0, 0, s * .26, s * .22)], col, line, 1.4);
+  c.restore();
+}
+
+function drawPlush(c, type, r){
+  c.save();
+  if(type === 'pigbun'){
+    const g = c.createRadialGradient(-r * .3, -r * .4, r * .1, 0, 0, r * 1.2); g.addColorStop(0, '#FFEDEB'); g.addColorStop(1, '#F9C4C4');
+    puff(c, [ell(c, -r * .52, -r * .78, r * .3, r * .42, -.25), ell(c, -r * .36, -r * .98, r * .22, r * .22), ell(c, r * .52, -r * .78, r * .3, r * .42, .25), ell(c, r * .36, -r * .98, r * .22, r * .22),
+      ell(c, 0, 0, r * 1.08, r * .84), ell(c, -r * .7, -r * .3, r * .38, r * .36), ell(c, r * .7, -r * .3, r * .38, r * .36)], g, '#E8A1A4', 1.6);
+    dotEyes(c, r, -r * .02, '#6984DE');
+    c.fillStyle = '#F5ADAE'; c.beginPath(); c.ellipse(0, r * .22, r * .2, r * .13, 0, 0, 7); c.fill();
+    c.fillStyle = '#D9878B'; for(const s of [-1, 1]){ c.beginPath(); c.ellipse(s * r * .07, r * .22, r * .035, r * .05, 0, 0, 7); c.fill(); }
+    blush(c, r, r * .2, '#F59A9C', .45, .62);
+  } else if(type === 'bear' || type === 'mini'){
+    const mini = type === 'mini';
+    const [top, bot, line, inner] = mini ? ['#FFF1A6', '#FFDA6A', '#E0B444', '#FFE9A0'] : ['#DDB084', '#BB8A5D', '#93633F', '#EBC9A0'];
+    const g = c.createLinearGradient(0, -r, 0, r); g.addColorStop(0, top); g.addColorStop(1, bot);
+    puff(c, [ell(c, -r * .68, -r * .62, r * .3, r * .3), ell(c, r * .68, -r * .62, r * .3, r * .3), ell(c, 0, 0, r * 1.02, r * .86)], g, line, mini ? 1.3 : 1.7);
+    c.fillStyle = inner; for(const s of [-1, 1]){ c.beginPath(); c.arc(s * r * .68, -r * .62, r * .15, 0, 7); c.fill(); }
+    c.fillStyle = mini ? '#FFF6CC' : '#EACAA2'; c.beginPath(); c.ellipse(0, r * .3, r * .32, r * .23, 0, 0, 7); c.fill();
+    dotEyes(c, r, -r * .06, '#4A3226', .065);
+    // happy open smile
+    c.fillStyle = '#5B3424'; c.beginPath(); c.moveTo(-r * .17, r * .22); c.quadraticCurveTo(0, r * .52, r * .17, r * .22); c.closePath(); c.fill();
+    c.fillStyle = '#F08C8C'; c.beginPath(); c.ellipse(0, r * .37, r * .08, r * .05, 0, 0, 7); c.fill();
+    blush(c, r, r * .22, '#F2765E', mini ? .35 : .5, .6);
+  } else {
+    const p = PLUSH[type];
+    const g = c.createLinearGradient(0, -r, 0, r); g.addColorStop(0, '#FFFFFF'); g.addColorStop(1, '#FBEFF2');
+    puff(c, [ell(c, -r * .92, r * .08, r * .3, r * .52, .45), ell(c, r * .92, r * .08, r * .3, r * .52, -.45), ell(c, 0, 0, r * 1.05, r * .8), ell(c, -r * .35, -r * .55, r * .5, r * .32), ell(c, r * .35, -r * .55, r * .5, r * .32)], g, '#8DA6EA', 1.6);
+    // three little hair strokes
+    c.strokeStyle = '#8DA6EA'; c.lineWidth = Math.max(1.2, r * .045); c.lineCap = 'round';
+    for(const k of [-1, 0, 1]){ c.beginPath(); c.moveTo(k * r * .1 - r * .02, -r * .48); c.lineTo(k * r * .1 + r * .02, -r * .36); c.stroke(); }
+    dotEyes(c, r, r * .02, '#5F7FDC');
+    c.fillStyle = '#F2706F'; c.beginPath(); c.arc(0, r * .16, r * .045, 0, 7); c.fill();
+    blush(c, r, r * .2, '#F7A8B4', .5, .55);
+    bow(c, -r * .72, -r * .42, r * .42, p.bow, p.bowLine);
+  }
+  c.restore();
 }
 
 /* tiny sound effects */
@@ -74,56 +89,39 @@ const Blip = (() => {
   };
 })();
 
-function gameState(){
-  const g = META.game || {};
-  if(g.day !== ymd()){ g.day = ymd(); g.coins = DAILY_COINS; }
-  META.game = g; META.prizes = META.prizes || {};
-  return g;
-}
-function saveGame(){ clearTimeout(saveGame.t); saveGame.t = setTimeout(() => Store.setMeta(META).catch(() => {}), 500); }
-
 VIEWS.game = async el => {
-  el.append(pageHead('เกมคีบตุ๊กตา', 'ได้เหรียญฟรีวันละ 5 เหรียญ คีบให้ได้แล้วเก็บไว้บนชั้นของสะสม'));
+  el.append(pageHead('เกมคีบตุ๊กตา', 'คีบเล่นได้ไม่จำกัด เลื่อนคันโยกแล้วกดปุ่มแดง'));
   el.append(clawMachine({globalKeys:true}));
 };
 
-/* the machine on its own, so the home page can show it next to the folders.
+/* the machine on its own, so the home page can show it too.
    globalKeys: arrow keys and Space work anywhere on the page (game page only);
-   otherwise they only work while the machine has focus or a coin is in play */
-function clawMachine({compact = false, globalKeys = false} = {}){
-  const g = gameState();
-  const wrap = h(`<div class="cm-wrap${compact ? ' compact' : ''}">
+   otherwise they only work while the machine has focus or the claw is moving */
+function clawMachine({globalKeys = false} = {}){
+  const wrap = h(`<div class="cm-wrap">
     <div class="claw-machine" tabindex="0" aria-label="ตู้คีบตุ๊กตา">
-      <div class="cm-sign"><span>LUCKY CATCH</span></div>
-      <div class="cm-window">
-        <canvas aria-label="ตู้คีบตุ๊กตา" role="img"></canvas>
-        <div class="cm-glass" aria-hidden="true"></div>
-        <div class="cm-msg" role="status" aria-live="polite"></div>
-      </div>
-      <div class="cm-panel">
-        <div class="cm-slots">
-          <span class="slot" aria-hidden="true"><i></i></span><span class="slot tilt" aria-hidden="true"><i></i></span>
-          <button class="cm-coin" aria-label="ใส่เหรียญ"><b>1</b><small>coin</small></button>
+      <div class="cm-body">
+        <div class="cm-sign"><span>LUCKY CATCH</span></div>
+        <div class="cm-window">
+          <canvas aria-label="ตู้คีบตุ๊กตา" role="img"></canvas>
+          <div class="cm-glass" aria-hidden="true"></div>
+          <div class="cm-msg" role="status" aria-live="polite"></div>
         </div>
-        <div class="cm-stick">
-          <button class="cm-dir" data-d="-1" aria-label="เลื่อนซ้าย">${ic('left')}</button>
-          <span class="cm-knob" aria-hidden="true"><i></i></span>
-          <button class="cm-dir" data-d="1" aria-label="เลื่อนขวา">${ic('right')}</button>
+        <div class="cm-panel">
+          <div class="cm-slots" aria-hidden="true">
+            <span class="slot"><i></i></span><span class="slot tilt"><i></i></span>
+            <span class="cm-coin"><b>1</b><small>coin</small></span>
+          </div>
+          <div class="cm-stick" role="group" aria-label="คันโยก">
+            <span class="cm-knob" aria-hidden="true"><i></i></span>
+            <button class="cm-dir l" data-d="-1" aria-label="เลื่อนซ้าย"></button>
+            <button class="cm-dir r" data-d="1" aria-label="เลื่อนขวา"></button>
+          </div>
+          <button class="cm-drop" aria-label="กดคีบ"><span></span></button>
         </div>
-        <button class="cm-drop" aria-label="กดคีบ"><span></span></button>
       </div>
     </div>
-    <aside class="cm-side">
-      <section class="glass cm-card">
-        <h3>เหรียญวันนี้</h3>
-        <div class="cm-coinrow"></div>
-        <p class="muted">กด <b>1 coin</b> เพื่อเริ่ม เลื่อนที่คีบด้วยปุ่มลูกศร แล้วกดปุ่มแดงเพื่อคีบ ใช้คีย์บอร์ดได้ด้วย ← → เลื่อน และ Space คีบ</p>
-      </section>
-      <section class="glass cm-card">
-        <h3>ชั้นของสะสม</h3>
-        <div class="cm-shelf"></div>
-      </section>
-    </aside>
+    <p class="cm-help muted">กดค้างที่คันโยกด้านซ้ายหรือขวาเพื่อเลื่อน แล้วกดปุ่มแดงเพื่อคีบ ใช้คีย์บอร์ดได้ด้วย ← → และ Space</p>
   </div>`);
 
   const cv = $('canvas', wrap), ctx = cv.getContext('2d');
@@ -132,40 +130,28 @@ function clawMachine({compact = false, globalKeys = false} = {}){
   const msg = $('.cm-msg', wrap);
   const say = (t, ms) => { msg.textContent = T(t); msg.classList.add('show'); clearTimeout(say.t); if(ms) say.t = setTimeout(() => msg.classList.remove('show'), ms); };
 
-  const renderCoins = () => {
-    const row = $('.cm-coinrow', wrap); row.innerHTML = '';
-    for(let i = 0; i < DAILY_COINS; i++) row.append(h(`<span class="coin ${i < g.coins ? 'on' : ''}" aria-hidden="true"></span>`));
-    row.append(h(`<span class="coin-txt">${LANG === 'en' ? `${g.coins} left` : `เหลือ ${g.coins} เหรียญ`}</span>`));
-    $('.cm-coin', wrap).disabled = g.coins <= 0 || S.state !== 'idle';
-  };
-  const renderShelf = () => {
-    const sh = $('.cm-shelf', wrap); sh.innerHTML = '';
-    const total = Object.values(META.prizes).reduce((a, b) => a + b, 0);
-    if(!total){ sh.append(h('<p class="muted" style="margin:0">ยังว่างอยู่ คีบตัวแรกให้ได้กัน</p>')); return; }
-    PLUSH_TYPES.forEach(t => {
-      const n = META.prizes[t] || 0; if(!n) return;
-      const it = h(`<div class="prize"><span class="pn">×${n}</span><span class="pl">${PLUSH[t].th}</span></div>`);
-      it.prepend(plushIcon(t, 58)); sh.append(it);
-    });
-  };
-
   /* ---- world ---- */
-  const S = {state:'idle', x:CM.homeX, rope:30, w:CLAW.rest, target:CLAW.rest, held:null, dir:0, slipAt:0, t:0};
+  const S = {state:'ready', x:CM.homeX, rope:30, w:CLAW.rest, target:CLAW.rest, held:null, dir:0, slipAt:0, pop:0};
   const hubY = () => CM.railY + 22 + S.rope;              // bottom of the claw's hub; arms hinge here
   const holdY = p => hubY() + p.r * .88;                   // plush centre when it hangs inside the claw
   const plush = [];
-  const addPlush = (x, y) => { const type = PLUSH_TYPES[(Math.random() * PLUSH_TYPES.length) | 0]; plush.push({type, x, y, vx:0, vy:0, r:25 + Math.random() * 6, won:false, fade:1}); };
-  for(let i = 0; i < 15; i++) addPlush(125 + Math.random() * 210, 150 + Math.random() * 260);
-  for(let k = 0; k < 240; k++) physics();
+  const addPlush = (x, y) => {
+    const type = PLUSH_BAG[(Math.random() * PLUSH_BAG.length) | 0];
+    plush.push({type, x, y, vx:0, vy:0, r:type === 'mini' ? 23 + Math.random() * 3 : 37 + Math.random() * 6, won:false, fade:1});
+  };
+  for(let i = 0; i < 12; i++) addPlush(140 + Math.random() * 210, 130 + Math.random() * 250);
+  for(let k = 0; k < 260; k++) physics();
 
   function physics(){
     for(const p of plush){
       if(p === S.held) continue;
       p.vy += .45; p.vx *= .985; p.vy *= .995; p.x += p.vx; p.y += p.vy;
-      const floor = CM.H - p.r * .9;
+      const floor = CM.H - p.r * .82;
       if(p.y > floor){ p.y = floor; p.vy *= -.15; p.vx *= .8; }
       if(p.x < 12 + p.r){ p.x = 12 + p.r; p.vx *= -.3; }
       if(p.x > CM.W - 12 - p.r){ p.x = CM.W - 12 - p.r; p.vx *= -.3; }
+      // an invisible glass wall keeps the pile out of the chute; only plushies the claw lets go of can fall in
+      if(!p.dropped && p.x - p.r < CM.chuteX + 4){ p.x = CM.chuteX + 4 + p.r; p.vx = Math.abs(p.vx) * .3; }
       if(p.y + p.r * .5 > CM.chuteTop){
         if(p.x < CM.chuteX){ if(p.x > CM.chuteX - 4 - p.r) { p.x = CM.chuteX - 4 - p.r; p.vx *= -.3; } }
         else if(p.x < CM.chuteX + 4 + p.r){ p.x = CM.chuteX + 4 + p.r; p.vx = Math.abs(p.vx) * .3; }
@@ -173,7 +159,7 @@ function clawMachine({compact = false, globalKeys = false} = {}){
     }
     for(let it = 0; it < 3; it++) for(let i = 0; i < plush.length; i++) for(let j = i + 1; j < plush.length; j++){
       const a = plush[i], b = plush[j]; if(a === S.held || b === S.held) continue;
-      const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || .01, min = (a.r + b.r) * .86;
+      const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || .01, min = (a.r + b.r) * .8;
       if(d < min){
         const push = (min - d) / 2, nx = dx / d, ny = dy / d;
         a.x -= nx * push; a.y -= ny * push; b.x += nx * push; b.y += ny * push;
@@ -184,8 +170,7 @@ function clawMachine({compact = false, globalKeys = false} = {}){
   }
 
   function step(){
-    const sp = 2.4;
-    if(S.state === 'ready' && S.dir){ S.x = Math.max(CM.homeX, Math.min(CM.W - 40, S.x + S.dir * sp)); }
+    if(S.state === 'ready' && S.dir){ S.x = Math.max(CM.homeX, Math.min(CM.W - 40, S.x + S.dir * 2.4)); }
     else if(S.state === 'down'){
       S.rope += 3.2;
       // stop when the hub reaches the top of a plush right under it, or the floor
@@ -203,7 +188,7 @@ function clawMachine({compact = false, globalKeys = false} = {}){
       S.w = Math.max(S.target, S.w - 1.1);
       if(S.grab && S.w < S.grab.r + 14){ const p = S.grab; p.vx += (S.x - p.x) * .08; p.vy = Math.min(p.vy, 0); }
       if(S.w <= S.target){
-        if(S.grab){ S.held = S.grab; S.held.vx = S.held.vy = 0; S.slipAt = Math.random() < .2 ? CM.homeX + 30 + Math.random() * Math.max(10, S.x - CM.homeX - 40) : -1; }
+        if(S.grab){ S.held = S.grab; S.held.vx = S.held.vy = 0; S.pop = 50; S.slipAt = Math.random() < .2 ? CM.homeX + 30 + Math.random() * Math.max(10, S.x - CM.homeX - 40) : -1; }
         S.grab = null; S.state = 'up';
       }
     } else if(S.state === 'up'){
@@ -211,63 +196,76 @@ function clawMachine({compact = false, globalKeys = false} = {}){
       if(S.rope <= 30){ S.state = 'carry'; if(!S.held){ say('พลาดไปนิดเดียว ลองใหม่นะ', 2200); Blip.miss(); } }
     } else if(S.state === 'carry'){
       S.x = Math.max(CM.homeX, S.x - 2.2);
-      if(S.held && S.slipAt > 0 && S.x <= S.slipAt){ const p = S.held; S.held = null; S.w = S.target = CLAW.rest; p.vy = 1; say('โอ๊ะ หลุดมือ ลองใหม่นะ', 2200); Blip.miss(); }
+      if(S.held && S.slipAt > 0 && S.x <= S.slipAt){ const p = S.held; S.held = null; S.w = S.target = CLAW.rest; p.vy = 1; p.dropped = p.x < CM.chuteX + p.r; say('โอ๊ะ หลุดมือ ลองใหม่นะ', 2200); Blip.miss(); }
       if(S.x <= CM.homeX){ S.state = 'release'; }
     } else if(S.state === 'release'){
       S.w = Math.min(CLAW.open, S.w + 1.2);
       // let go once the arms have opened a little past the plush (big ones included)
-      if(S.held && S.w >= Math.min(S.held.r + 6, CLAW.open - 2)){ const p = S.held; S.held = null; p.vy = 2; p.vx = .3; }
-      if(S.w >= CLAW.open){ if(S.held){ S.held.vy = 2; S.held = null; } S.w = S.target = CLAW.rest; S.state = 'idle'; renderCoins(); if(!plush.some(p => p.x < CM.chuteX && !p.won)) say(g.coins > 0 ? 'ใส่เหรียญเพื่อเล่นอีกครั้ง' : 'เหรียญวันนี้หมดแล้ว พรุ่งนี้มาใหม่นะ'); }
+      if(S.held && S.w >= Math.min(S.held.r + 6, CLAW.open - 2)){ const p = S.held; S.held = null; p.vy = 2; p.vx = .3; p.dropped = true; }
+      if(S.w >= CLAW.open){ if(S.held){ S.held.vy = 2; S.held.dropped = true; S.held = null; } S.w = S.target = CLAW.rest; S.state = 'ready'; }
     }
+    if(S.pop) S.pop--;
     if(S.held){ S.held.x = S.x; S.held.y = holdY(S.held); }
     physics();
-    // prizes that reach the bottom of the chute
+    // prizes that reach the bottom of the chute: celebrate, then the machine refills itself
     for(const p of plush){
       if(!p.won && p.x < CM.chuteX && p.y > CM.H - p.r * 1.3 && p !== S.held){
-        p.won = true; META.prizes[p.type] = (META.prizes[p.type] || 0) + 1; saveGame(); renderShelf(); Blip.win();
-        say(LANG === 'en' ? `You caught a ${p.type}!` : `ได้${PLUSH[p.type].th}แล้ว เก่งมาก!`, 2600);
+        p.won = true; Blip.win();
+        say(LANG === 'en' ? 'You caught one! 🎉' : `ได้${PLUSH[p.type].th}แล้ว เก่งมาก!`, 2600);
         const r = cv.getBoundingClientRect(); Trail.spawn(r.left + p.x / CM.W * r.width, r.top + p.y / CM.H * r.height, 30, true);
       }
       if(p.won) p.fade -= .02;
     }
     for(let i = plush.length - 1; i >= 0; i--) if(plush[i].fade <= 0) plush.splice(i, 1);
-    if(plush.filter(p => !p.won).length < 11 && S.state === 'idle' && Math.random() < .02) addPlush(150 + Math.random() * 170, -30);
+    if(plush.filter(p => !p.won).length < 10 && S.state === 'ready' && Math.random() < .02) addPlush(160 + Math.random() * 180, -30);
   }
 
   function draw(){
     const c = ctx; c.clearRect(0, 0, CM.W, CM.H);
-    const bg = c.createLinearGradient(0, 0, 0, CM.H); bg.addColorStop(0, '#FFEFD9'); bg.addColorStop(1, '#FFD9C9'); c.fillStyle = bg; c.fillRect(0, 0, CM.W, CM.H);
-    c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.moveTo(200, 0); c.lineTo(250, 0); c.lineTo(80, CM.H); c.lineTo(30, CM.H); c.fill();
-    // chute
-    c.fillStyle = 'rgba(255,255,255,.35)'; c.fillRect(12, CM.chuteTop, CM.chuteX - 12, CM.H - CM.chuteTop);
+    const bg = c.createLinearGradient(0, 0, 0, CM.H); bg.addColorStop(0, '#FFEEDC'); bg.addColorStop(1, '#FFD4C2'); c.fillStyle = bg; c.fillRect(0, 0, CM.W, CM.H);
+    // soft light streaks on the back glass
+    c.fillStyle = 'rgba(255,255,255,.28)'; c.beginPath(); c.moveTo(250, 0); c.lineTo(300, 0); c.lineTo(110, CM.H); c.lineTo(60, CM.H); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.16)'; c.beginPath(); c.moveTo(320, 0); c.lineTo(338, 0); c.lineTo(150, CM.H); c.lineTo(132, CM.H); c.fill();
+    // prize chute
+    c.fillStyle = 'rgba(255,255,255,.4)'; c.fillRect(12, CM.chuteTop, CM.chuteX - 12, CM.H - CM.chuteTop);
     c.strokeStyle = '#F29AB5'; c.lineWidth = 3; c.beginPath(); c.moveTo(12, CM.chuteTop); c.lineTo(CM.chuteX, CM.chuteTop); c.lineTo(CM.chuteX, CM.H); c.stroke();
-    c.fillStyle = '#E0708F'; c.font = '700 11px system-ui,sans-serif'; c.textAlign = 'center'; c.fillText('PRIZE', 55, CM.chuteTop + 18);
-    c.beginPath(); c.moveTo(48, CM.chuteTop + 26); c.lineTo(62, CM.chuteTop + 26); c.lineTo(55, CM.chuteTop + 35); c.fill();
-    // plush (back to front by y)
+    c.fillStyle = '#E0708F'; c.font = '700 11px system-ui,sans-serif'; c.textAlign = 'center'; c.fillText('PRIZE', (12 + CM.chuteX) / 2, CM.chuteTop + 18);
+    c.beginPath(); c.moveTo(49, CM.chuteTop + 26); c.lineTo(63, CM.chuteTop + 26); c.lineTo(56, CM.chuteTop + 35); c.fill();
+    // plush (back to front)
     [...plush].sort((a, b) => a.y - b.y).forEach(p => { c.save(); c.globalAlpha = Math.max(0, p.fade); c.translate(p.x, p.y); drawPlush(c, p.type, p.r); c.restore(); });
-    // rail + carriage + claw
+    // rail with its end bracket, carriage, rod and claw
     const hy = hubY();
-    c.fillStyle = '#AFC0F2'; c.strokeStyle = '#7F95D8'; c.lineWidth = 2;
-    roundRect(c, 6, CM.railY - 5, CM.W - 12, 10, 5); c.fill(); c.stroke();
-    roundRect(c, S.x - 20, CM.railY - 10, 40, 22, 6); c.fillStyle = '#D5DEFA'; c.fill(); c.stroke();
-    c.strokeStyle = '#9CAEE8'; c.lineWidth = 5; c.beginPath(); c.moveTo(S.x, CM.railY + 12); c.lineTo(S.x, hy - 10); c.stroke();
-    // arms: hinge at the hub, knee out at the side of the plush, tip curls in under it
+    c.fillStyle = '#B9C8F4'; c.strokeStyle = '#8AA0E2'; c.lineWidth = 2;
+    roundRect(c, -6, CM.railY - 6, CM.W + 12, 12, 6); c.fill(); c.stroke();
+    roundRect(c, CM.W - 30, CM.railY - 12, 26, 70, 6); c.fillStyle = 'rgba(205,216,248,.75)'; c.fill(); c.stroke();
+    roundRect(c, S.x - 24, CM.railY - 12, 48, 26, 7); c.fillStyle = '#D3DDFA'; c.fill(); c.stroke();
+    c.fillStyle = '#B9C8F4'; roundRect(c, S.x - 4, CM.railY + 12, 8, hy - CM.railY - 22, 4); c.fill(); c.stroke();
     c.lineCap = 'round'; c.lineJoin = 'round';
     for(const s of [-1, 1]){
       const w = S.w, kx = S.x + s * w, ky = hy + Math.sqrt(Math.max(0, CLAW.len * CLAW.len - w * w)) * .78;
       const tx = kx - s * Math.max(4, w * .42), ty = ky + CLAW.tip;
-      c.strokeStyle = '#6F86D2'; c.lineWidth = 7; c.beginPath(); c.moveTo(S.x + s * 5, hy); c.quadraticCurveTo(kx + s * 3, hy + 2, kx, ky); c.lineTo(tx, ty); c.stroke();
-      c.strokeStyle = '#B7C6F6'; c.lineWidth = 3; c.beginPath(); c.moveTo(S.x + s * 5, hy); c.quadraticCurveTo(kx + s * 3, hy + 2, kx, ky); c.lineTo(tx, ty); c.stroke();
-      c.fillStyle = '#FFC4D6'; c.beginPath(); c.arc(tx, ty, 3.2, 0, 7); c.fill();
+      c.strokeStyle = '#7F95DE'; c.lineWidth = 8; c.beginPath(); c.moveTo(S.x + s * 5, hy); c.quadraticCurveTo(kx + s * 3, hy + 2, kx, ky); c.lineTo(tx, ty); c.stroke();
+      c.strokeStyle = '#C3D0F7'; c.lineWidth = 3.5; c.beginPath(); c.moveTo(S.x + s * 5, hy); c.quadraticCurveTo(kx + s * 3, hy + 2, kx, ky); c.lineTo(tx, ty); c.stroke();
     }
-    c.fillStyle = '#8FA3E8'; roundRect(c, S.x - 15, hy - 14, 30, 16, 8); c.fill();
-    c.fillStyle = '#FFC4D6'; c.beginPath(); c.arc(S.x, hy - 6, 5, 0, 7); c.fill();
+    c.fillStyle = '#9DB1EE'; c.strokeStyle = '#7F95DE'; c.beginPath(); c.arc(S.x, hy - 6, 10, 0, 7); c.fill(); c.stroke();
+    c.fillStyle = '#FFE6A6'; c.beginPath(); c.ellipse(S.x, hy - 6, 10, 3.5, 0, 0, 7); c.fill();
+    c.fillStyle = '#F7B6C8'; c.beginPath(); c.arc(S.x, hy + 4, 5, 0, 7); c.fill();
+    // "got it!" marks
+    if(S.pop && S.held){
+      const p = S.held, a = Math.min(1, S.pop / 15);
+      c.save(); c.globalAlpha = a; c.strokeStyle = '#F2768F'; c.lineWidth = 5;
+      for(const [dx, dy, l, ang] of [[-1.2, -.6, 16, -2.6], [-1.05, -1.05, 18, -2.2], [-.6, -1.3, 16, -1.8]]){
+        const x = p.x + dx * p.r, y = p.y + dy * p.r; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(ang) * l, y + Math.sin(ang) * l); c.stroke();
+      }
+      c.restore();
+    }
   }
   function roundRect(c, x, y, w, hh, r){ c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + hh, r); c.arcTo(x + w, y + hh, x, y + hh, r); c.arcTo(x, y + hh, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
 
   let raf = 0, lastMove = 0, lastT = performance.now(), acc = 0, waited = 0, onScreen = true;
   // pause the simulation while the machine is scrolled out of view
   if(window.IntersectionObserver) new IntersectionObserver(es => { onScreen = es[0].isIntersecting; }).observe(cv);
+  const knob = $('.cm-knob', wrap);
   const loop = now => {
     if(!cv.isConnected){
       // the view is built before it is put on the page, so wait a little before giving up
@@ -275,46 +273,49 @@ function clawMachine({compact = false, globalKeys = false} = {}){
       cancelAnimationFrame(raf); removeEventListener('keydown', onKey); removeEventListener('keyup', onKeyUp); return;
     }
     wrap.dataset.live = '1';
-    if(!onScreen && S.state === 'idle'){ lastT = now || performance.now(); raf = requestAnimationFrame(loop); return; }
+    if(!onScreen && S.state === 'ready'){ lastT = now || performance.now(); raf = requestAnimationFrame(loop); return; }
     // fixed 60 steps per second, so the claw moves at the same speed on 60 Hz and 120 Hz screens
     acc += Math.min(100, (now || performance.now()) - lastT); lastT = now || performance.now();
     let n = 0; while(acc >= 16.67 && n < 5){ step(); acc -= 16.67; n++; }
     if(n === 5) acc = 0;
     draw();
     if(S.dir && S.state === 'ready' && performance.now() - lastMove > 120){ lastMove = performance.now(); Blip.move(); }
-    $('.cm-knob', wrap).style.transform = `rotate(${S.dir * 18}deg)`;
+    knob.style.transform = `rotate(${S.dir * 20}deg)`;
     raf = requestAnimationFrame(loop);
   };
 
-  /* ---- controls ---- */
-  const insert = () => {
-    if(S.state !== 'idle' || g.coins <= 0) return;
-    g.coins--; saveGame(); Blip.coin(); S.state = 'ready'; renderCoins();
-    say('เลื่อนที่คีบแล้วกดปุ่มแดง', 2400);
-  };
-  const drop = () => { if(S.state !== 'ready') return; S.state = 'down'; S.w = S.target = CLAW.open; S.dir = 0; Blip.drop(); msg.classList.remove('show'); };
-  $('.cm-coin', wrap).onclick = insert;
+  /* ---- controls: hold either side of the joystick, red button grabs ---- */
+  const drop = () => { if(S.state !== 'ready') return; S.state = 'down'; S.dir = 0; S.w = S.target = CLAW.open; Blip.drop(); msg.classList.remove('show'); };
   $('.cm-drop', wrap).onclick = drop;
   $$('.cm-dir', wrap).forEach(b => {
     const d = Number(b.dataset.d);
     b.addEventListener('pointerdown', e => { e.preventDefault(); b.setPointerCapture(e.pointerId); S.dir = d; });
     const stop = () => { if(S.dir === d) S.dir = 0; };
     b.addEventListener('pointerup', stop); b.addEventListener('pointercancel', stop); b.addEventListener('lostpointercapture', stop);
+    b.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); S.dir = d; } });
+    b.addEventListener('keyup', stop);
   });
   const onKey = e => {
     if(document.querySelector('.modal-back')) return;
     const a = document.activeElement;
     if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return;
-    if(!globalKeys && !wrap.contains(a) && S.state !== 'ready') return;
+    if(!globalKeys && !wrap.contains(a)) return;
+    if(a && a.classList.contains('cm-dir')) return;
     if(e.key === 'ArrowLeft'){ S.dir = -1; e.preventDefault(); }
     else if(e.key === 'ArrowRight'){ S.dir = 1; e.preventDefault(); }
-    else if(e.key === ' ' || e.key === 'Enter'){ if(S.state === 'idle') insert(); else drop(); e.preventDefault(); }
+    else if(e.key === ' ' || e.key === 'Enter'){ if(a && a.classList.contains('cm-drop') && e.key === 'Enter') return; drop(); e.preventDefault(); }
   };
   const onKeyUp = e => { if((e.key === 'ArrowLeft' && S.dir === -1) || (e.key === 'ArrowRight' && S.dir === 1)) S.dir = 0; };
   addEventListener('keydown', onKey); addEventListener('keyup', onKeyUp);
 
-  renderCoins(); renderShelf();
-  say(g.coins > 0 ? 'กด 1 coin เพื่อเริ่มเล่น' : 'เหรียญวันนี้หมดแล้ว พรุ่งนี้มาใหม่นะ');
+  say('เลื่อนคันโยกแล้วกดปุ่มแดงเพื่อคีบ', 3200);
   raf = requestAnimationFrame(loop);
   return wrap;
 }
+
+Object.assign(DICT, {
+  'คีบเล่นได้ไม่จำกัด เลื่อนคันโยกแล้วกดปุ่มแดง':'Play as much as you like: move the joystick, then press the red button',
+  'เลื่อนคันโยกแล้วกดปุ่มแดงเพื่อคีบ':'Move the joystick, then press the red button',
+  'กดค้างที่คันโยกด้านซ้ายหรือขวาเพื่อเลื่อน แล้วกดปุ่มแดงเพื่อคีบ ใช้คีย์บอร์ดได้ด้วย ← → และ Space':'Hold the left or right side of the joystick to move, then press the red button to grab. Keyboard works too: ← → and Space',
+  'คันโยก':'Joystick'
+});

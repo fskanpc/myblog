@@ -23,7 +23,7 @@ function renderShell(){
   const app = $('#app');
   app.innerHTML = '';
   const bar = h(`<header class="topbar glass" aria-label="แถบด้านบน">
-    <a class="tb-brand" href="#home" aria-label="หน้าแรก"><span class="brand-orb"></span><span>${esc(META.siteName || 'My Little Bubble')}</span></a>
+    <a class="tb-brand" href="#home" aria-label="Serenesky Diaries · หน้าแรก"><span class="tb-logo" aria-hidden="true"></span></a>
     <a class="tb-home" href="#home">${ic('home')}<span>แฟ้มของฉัน</span></a>
     <div class="tb-acts">
       <button class="icon-btn" id="themeBtn" aria-label="เปลี่ยนธีม"></button>
@@ -31,7 +31,11 @@ function renderShell(){
       <button class="icon-btn" id="outBtn" aria-label="ออกจากระบบ" title="ออกจากระบบ">${ic('logout')}</button>
     </div>
   </header>`);
-  app.append(bar, h('<main id="main" tabindex="-1"></main>'));
+  const foot = h(`<footer class="site-foot">
+    <span class="sf-logo" role="img" aria-label="Serenesky Diaries"></span>
+    <p class="sf-tag">made with love <span aria-hidden="true">✿</span> ${esc(META.siteName || 'My Little Bubble')}</p>
+  </footer>`);
+  app.append(bar, h('<main id="main" tabindex="-1"></main>'), foot);
   $('#themeBtn').onclick = cycleTheme;
   $('#langBtn').onclick = () => setLang(LANG === 'en' ? 'th' : 'en');
   $('#outBtn').onclick = () => Auth.logout();
