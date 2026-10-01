@@ -129,5 +129,4 @@ main{padding-bottom:40px}
 @keyframes ribbon{to{transform:translateX(-50%)}}
 
 /* ---------- photobooth & claw machine cards follow the paper look ---------- */
-.cm-card{border-radius:24px}
 .pb-board{border:2px solid var(--glass-border)}
