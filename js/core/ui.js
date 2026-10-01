@@ -84,15 +84,43 @@ function fieldEl(f, v){
   } else if(f.type === 'textarea'){
     const t = h(`<textarea id="${id}" rows="${f.rows || 5}" ${f.placeholder ? `placeholder="${escT(f.placeholder)}"` : ''}></textarea>`);
     t.value = v[f.key] ?? ''; t.oninput = () => v[f.key] = t.value; wrap.append(t);
-  } else if(f.type === 'select'){
-    const row = h('<div class="opt-row" role="radiogroup"></div>');
-    f.options.forEach(o => {
-      const [val, l] = Array.isArray(o) ? o : [o, o];
-      const b = h(`<button type="button" class="opt ${v[f.key] === val ? 'on' : ''}" role="radio" aria-checked="${v[f.key] === val}">${l}</button>`);
-      b.onclick = () => { v[f.key] = val; $$('.opt', row).forEach(x => { x.classList.remove('on'); x.setAttribute('aria-checked','false'); }); b.classList.add('on'); b.setAttribute('aria-checked','true'); };
-      row.append(b);
-    });
+  } else if(f.type === 'select' || f.type === 'multi'){
+    // select: pick one · multi: pick any number (stored as an array) · addable: type a new option
+    const multi = f.type === 'multi';
+    if(multi && !Array.isArray(v[f.key])) v[f.key] = v[f.key] ? [v[f.key]] : [];
+    const row = h(`<div class="opt-row" role="${multi ? 'group' : 'radiogroup'}"></div>`);
+    const isOn = val => multi ? v[f.key].includes(val) : v[f.key] === val;
+    const addOpt = (val, l) => {
+      const b = h(`<button type="button" class="opt ${isOn(val) ? 'on' : ''}" role="${multi ? 'checkbox' : 'radio'}" aria-checked="${isOn(val)}">${l}</button>`);
+      b.dataset.val = val;
+      b.onclick = () => {
+        if(multi){ v[f.key] = isOn(val) ? v[f.key].filter(x => x !== val) : [...v[f.key], val]; }
+        else { v[f.key] = val; $$('.opt', row).forEach(x => { x.classList.remove('on'); x.setAttribute('aria-checked','false'); }); }
+        b.classList.toggle('on', isOn(val)); b.setAttribute('aria-checked', isOn(val));
+      };
+      row.append(b); return b;
+    };
+    const known = new Set();
+    f.options.forEach(o => { const [val, l] = Array.isArray(o) ? o : [o, o]; known.add(val); addOpt(val, l); });
+    // values saved earlier that are no longer in the list still show up
+    (multi ? v[f.key] : [v[f.key]]).forEach(val => { if(val && !known.has(val)){ known.add(val); addOpt(val, escT(val)); } });
     wrap.append(row);
+    if(f.addable){
+      const add = h(`<div class="opt-add"><input type="text" maxlength="40" placeholder="${escT(f.addable)}" aria-label="${escT(f.addable)}"><button type="button" class="opt">${ic('plus')}</button></div>`);
+      const inp = $('input', add);
+      const go = () => {
+        let val = inp.value.trim(); if(!val) return;
+        // typing an option that already exists (any case) just picks it
+        const same = [...known].find(k => k && k.toLowerCase() === val.toLowerCase());
+        if(same) val = same; else { known.add(val); addOpt(val, escT(val)); }
+        const b = [...$$('.opt', row)].find(x => x.dataset.val === val);
+        if(b && !isOn(val)) b.click();
+        inp.value = '';
+      };
+      $('button', add).onclick = go;
+      inp.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); go(); } };
+      wrap.append(add);
+    }
   } else if(f.type === 'stars'){
     const row = h('<div class="star-in"></div>');
     const paint = () => $$('button', row).forEach((b, i) => b.classList.toggle('on', i < (v[f.key] || 0)));
