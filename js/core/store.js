@@ -2,6 +2,14 @@
    storage: Supabase (Postgres + Row Level Security)
    ========================================================= */
 const SECTIONS = ['diary','books','tarot','travel','screen','music','vocab','planner','photobooth'];
+/* text copied from PDFs or web pages can carry invisible control characters; Postgres jsonb
+   rejects \u0000 ("unsupported Unicode escape sequence"), so clean every string before saving */
+function cleanForDb(x){
+  if(typeof x === 'string') return x.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\uFFFE\uFFFF]/g, '').replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
+  if(Array.isArray(x)) return x.map(cleanForDb);
+  if(x && typeof x === 'object'){ const o = {}; for(const k in x) o[k] = cleanForDb(x[k]); return o; }
+  return x;
+}
 const Store = {
   mode:'supabase', uid:null, email:'', sb:null, cache:{},
   init(){
@@ -28,6 +36,7 @@ const Store = {
     const items = await this.list(section);
     if(!item.id){ item.id = this.newId(); item.createdAt = Date.now(); }
     item.updatedAt = Date.now();
+    Object.assign(item, cleanForDb(item));
     const {id, ...data} = item;
     const {error} = await this.sb.from('items').upsert({user_id:this.uid, id, section, data}, {onConflict:'user_id,id'});
     if(error) throw new Error(error.message);
@@ -48,7 +57,7 @@ const Store = {
     return (data && data.meta) || {};
   },
   async setMeta(meta){
-    const {error} = await this.sb.from('profiles').upsert({user_id:this.uid, meta}, {onConflict:'user_id'});
+    const {error} = await this.sb.from('profiles').upsert({user_id:this.uid, meta:cleanForDb(meta)}, {onConflict:'user_id'});
     if(error) throw new Error(error.message);
   }
 };
