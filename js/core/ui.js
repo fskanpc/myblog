@@ -16,7 +16,7 @@ function modal({title, body, actions = [], wide}){
   }
   const prev = document.activeElement;
   const close = () => { back.classList.remove('show'); document.removeEventListener('keydown', onKey); setTimeout(() => back.remove(), 250); if(prev && prev.focus) prev.focus(); };
-  const onKey = e => { if(e.key === 'Escape') close(); };
+  const onKey = e => { if(e.key === 'Escape' && back === $$('.modal-back').pop()) close(); };   // only the top modal closes
   back.addEventListener('mousedown', e => { if(e.target === back) close(); });
   $('[data-x]', back).onclick = close;
   document.addEventListener('keydown', onKey);
