@@ -136,4 +136,6 @@ main{padding-bottom:40px}
 /* tarot room: dark top bar, so the logo glows gold and the home pill keeps dark text */
 body[data-route="tarot"] .topbar{--logo-c:#FFE9A8}
 body[data-route="tarot"] .topbar .tb-logo{filter:drop-shadow(0 0 6px rgba(232,200,114,.45))}
-body[data-route="tarot"] .tb-home{color:#3D4A8B}
+body[data-route="tarot"] .topbar .tb-home{background:linear-gradient(135deg,#E8C872,#C9A8FF);color:#1A1236;outline-color:rgba(26,18,54,.35);box-shadow:0 3px 0 rgba(120,80,30,.45)}
+/* tarot title: gold lettering on a dark pill (the theme's pastel pill + navy text are unreadable here) */
+body[data-route="tarot"] .page-head h1{background:rgba(28,18,66,.6);border:1.5px solid rgba(232,200,114,.45);box-shadow:0 0 30px -8px rgba(232,200,114,.5);color:#FFE9A8;-webkit-background-clip:border-box;background-clip:border-box;text-shadow:0 0 14px rgba(232,200,114,.55),0 2px 0 #8A6420}
