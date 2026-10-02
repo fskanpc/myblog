@@ -76,7 +76,9 @@ function fieldEl(f, v){
   const lab = f.type === 'text' || f.type === 'date' || f.type === 'number' || f.type === 'url' || f.type === 'time' || f.type === 'textarea'
     ? `<label for="${id}">${f.label}${f.required ? ' *' : ''}</label>` : `<span class="lbl">${f.label}</span>`;
   wrap.innerHTML = lab;
-  if(['text','date','number','url','time'].includes(f.type)){
+  if(f.type === 'date'){
+    wrap.append(datePicker(id, v, f));
+  } else if(['text','number','url','time'].includes(f.type)){
     const inp = h(`<input id="${id}" type="${f.type}" ${f.placeholder ? `placeholder="${escT(f.placeholder)}"` : ''} ${f.type === 'number' ? 'min="0" step="any"' : ''}>`);
     inp.value = v[f.key] ?? '';
     inp.oninput = () => v[f.key] = f.type === 'number' ? (inp.value === '' ? '' : Number(inp.value)) : inp.value;
@@ -199,3 +201,71 @@ function crud(section, fields, label, en = ''){
     edit(item){ openForm({title:L('แก้ไข' + label, 'Edit ' + en), fields, value:item, onSave: async v => { await Store.save(section, v); rerender(); }, onDelete: async () => { await Store.remove(section, item.id); rerender(); }}); }
   };
 }
+
+/* =========================================================
+   date picker: our own calendar, so month and year can be
+   picked straight from dropdowns (Safari's built-in one can't)
+   value stays a "YYYY-MM-DD" string
+   ========================================================= */
+function datePicker(id, v, f){
+  const box = h(`<div class="dp">
+    <button type="button" id="${id}" class="dp-field" aria-haspopup="dialog" aria-expanded="false"><span class="dp-text"></span>${ic('planner')}</button>
+    <div class="dp-pop" role="dialog" aria-label="${T('เลือกวันที่')}" hidden>
+      <div class="dp-head">
+        <button type="button" class="dp-nav" data-d="-1" aria-label="${T('เดือนก่อน')}">${ic('left')}</button>
+        <select class="dp-m" aria-label="${T('เดือน')}"></select>
+        <select class="dp-y" aria-label="${T('ปี')}"></select>
+        <button type="button" class="dp-nav" data-d="1" aria-label="${T('เดือนถัดไป')}">${ic('right')}</button>
+      </div>
+      <div class="dp-week"></div>
+      <div class="dp-grid" role="grid"></div>
+      <div class="dp-foot"><button type="button" class="dp-today">${T('วันนี้')}</button>${f.required ? '' : `<button type="button" class="dp-clear">${T('ล้าง')}</button>`}</div>
+    </div>
+  </div>`);
+  const field = $('.dp-field', box), pop = $('.dp-pop', box), mSel = $('.dp-m', box), ySel = $('.dp-y', box), grid = $('.dp-grid', box);
+  const months = LANG === 'en' ? EN_MONTHS : TH_MONTHS;
+  const days = LANG === 'en' ? ['S','M','T','W','T','F','S'] : ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  $('.dp-week', box).innerHTML = days.map(d => `<span>${d}</span>`).join('');
+  months.forEach((m, i) => mSel.append(new Option(m, i)));
+  const parse = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
+  const yLabel = y => LANG === 'en' ? String(y) : `${y + 543}`;
+  let view = parse(v[f.key]) || new Date();
+  const fillYears = () => {
+    const now = new Date().getFullYear(), sel = view.getFullYear();
+    const from = Math.min(now - 100, sel - 5), to = Math.max(now + 10, sel + 5);
+    ySel.innerHTML = '';
+    for(let y = to; y >= from; y--) ySel.append(new Option(yLabel(y), y));
+  };
+  const showText = () => {
+    const d = parse(v[f.key]);
+    $('.dp-text', box).textContent = d ? thDate(v[f.key]) : T('เลือกวันที่');
+    field.classList.toggle('empty', !d);
+  };
+  const draw = () => {
+    fillYears();
+    mSel.value = view.getMonth(); ySel.value = view.getFullYear();
+    const y = view.getFullYear(), m = view.getMonth(), start = new Date(y, m, 1).getDay(), n = new Date(y, m + 1, 0).getDate();
+    const sel = v[f.key], today = ymd();
+    grid.innerHTML = '';
+    for(let i = 0; i < start; i++) grid.append(h('<span></span>'));
+    for(let d = 1; d <= n; d++){
+      const key = ymd(new Date(y, m, d));
+      const b = h(`<button type="button" class="${key === sel ? 'on' : ''} ${key === today ? 'today' : ''}">${d}</button>`);
+      b.onclick = () => { v[f.key] = key; showText(); close(); };
+      grid.append(b);
+    }
+  };
+  const onDoc = e => { if(!box.contains(e.target)) close(); };
+  const onKey = e => { if(e.key === 'Escape'){ e.stopPropagation(); close(); field.focus(); } };
+  const open = () => { view = parse(v[f.key]) || new Date(); draw(); pop.hidden = false; field.setAttribute('aria-expanded', 'true'); setTimeout(() => document.addEventListener('mousedown', onDoc), 0); pop.addEventListener('keydown', onKey); };
+  const close = () => { pop.hidden = true; field.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', onDoc); };
+  field.onclick = () => pop.hidden ? open() : close();
+  mSel.onchange = () => { view = new Date(view.getFullYear(), +mSel.value, 1); draw(); };
+  ySel.onchange = () => { view = new Date(+ySel.value, view.getMonth(), 1); draw(); };
+  $$('.dp-nav', box).forEach(b => b.onclick = () => { view = new Date(view.getFullYear(), view.getMonth() + Number(b.dataset.d), 1); draw(); });
+  $('.dp-today', box).onclick = () => { v[f.key] = ymd(); showText(); close(); };
+  if($('.dp-clear', box)) $('.dp-clear', box).onclick = () => { v[f.key] = ''; showText(); close(); };
+  showText();
+  return box;
+}
+Object.assign(DICT, {'เลือกวันที่':'Pick a date', 'เดือนก่อน':'Previous month', 'เดือนถัดไป':'Next month', 'เดือน':'Month', 'ปี':'Year', 'ล้าง':'Clear'});
