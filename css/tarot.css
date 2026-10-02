@@ -85,3 +85,11 @@ body[data-route="tarot"] .empty .em-orb svg{color:#E8C872}
   .tg-table .c-no{float:left;width:auto;margin-right:8px}
 }
 .tcard.flip .tfront,.tcard:not(.flip) .tback{pointer-events:none}
+/* Safari draws the front's name label through the flipped card; hide each face once it has turned away */
+.tfront,.tback{transition:visibility 0s .3s}
+.tback{visibility:hidden}
+.tcard.flip .tfront{visibility:hidden}
+.tcard.flip .tback{visibility:visible}
+/* the three buttons on the back fit on one line as small pills */
+.tback .tact{flex-wrap:wrap;gap:5px}
+.tback .tact button{padding:4px 10px;font-size:12px;line-height:1.4;white-space:nowrap;flex:none}
