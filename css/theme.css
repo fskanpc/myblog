@@ -70,7 +70,7 @@ h1,h2,h3{font-family:var(--display)}
 body[data-route="diary"]{--pill:#F9CFDC} body[data-route="books"]{--pill:#FFE0C4} body[data-route="tarot"]{--pill:#E1D6F7}
 body[data-route="travel"]{--pill:#D6E6FA} body[data-route="screen"]{--pill:#FFD3D8} body[data-route="music"]{--pill:#CFEEDF}
 body[data-route="vocab"]{--pill:#FBEAA8} body[data-route="planner"]{--pill:#D9E0FC} body[data-route="profile"]{--pill:#F6DDB0}
-body[data-route="photobooth"]{--pill:#FFD0DC} body[data-route="game"]{--pill:#FFD7E4}
+body[data-route="english"]{--pill:#CFE9FB} body[data-route="photobooth"]{--pill:#FFD0DC} body[data-route="game"]{--pill:#FFD7E4}
 body[data-route="tarot"] .page-head h1{color:#3D3466}
 
 /* ---------- buttons, chips and fields ---------- */

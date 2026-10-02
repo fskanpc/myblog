@@ -1,7 +1,7 @@
 /* =========================================================
    storage: Supabase (Postgres + Row Level Security)
    ========================================================= */
-const SECTIONS = ['diary','books','tarot','travel','screen','music','vocab','planner','photobooth'];
+const SECTIONS = ['diary','books','tarot','travel','screen','music','vocab','english','planner','photobooth'];
 /* text copied from PDFs or web pages can carry invisible control characters; Postgres jsonb
    rejects \u0000 ("unsupported Unicode escape sequence"), so clean every string before saving */
 function cleanForDb(x){
@@ -50,6 +50,24 @@ const Store = {
     const items = await this.list(section);
     const i = items.findIndex(x => x.id === id);
     if(i >= 0) items.splice(i, 1);
+  },
+  /* video files go to Supabase Storage (bucket "videos", one folder per user), not the items table */
+  async uploadVideo(file){
+    const ext = (file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4';
+    const path = `${this.uid}/${this.newId()}.${ext}`;
+    const {error} = await this.sb.storage.from('videos').upload(path, file, {contentType:file.type || 'video/mp4', upsert:false});
+    if(error) throw new Error(/bucket not found/i.test(error.message) ? 'ยังไม่ได้สร้างที่เก็บวิดีโอใน Supabase (ดู README)' : error.message);
+    return path;
+  },
+  async videoUrl(path){
+    const {data, error} = await this.sb.storage.from('videos').createSignedUrl(path, 60 * 60 * 6);
+    if(error){ console.error(error); return ''; }
+    return data.signedUrl;
+  },
+  async removeVideo(path){
+    if(!path) return;
+    const {error} = await this.sb.storage.from('videos').remove([path]);
+    if(error) console.error(error);
   },
   async getMeta(){
     const {data, error} = await this.sb.from('profiles').select('meta').eq('user_id', this.uid).maybeSingle();
