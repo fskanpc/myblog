@@ -133,3 +133,7 @@ main{padding-bottom:40px}
 
 .tb-home span{white-space:nowrap}
 .page-head h1{color:#3D4A8B}
+/* tarot room: dark top bar, so the logo glows gold and the home pill keeps dark text */
+body[data-route="tarot"] .topbar{--logo-c:#FFE9A8}
+body[data-route="tarot"] .topbar .tb-logo{filter:drop-shadow(0 0 6px rgba(232,200,114,.45))}
+body[data-route="tarot"] .tb-home{color:#3D4A8B}
