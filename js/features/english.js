@@ -57,18 +57,43 @@ function engGrab(video){
     catch(e){ rej(new Error(T('คลิปนี้ไม่อนุญาตให้จับภาพ'))); }   // cross-origin video without CORS
   });
 }
-/* grab a picture about 10% into the clip (at most 1 s in) without showing anything */
+/* grab a picture about 10% into the clip (at most 1 s in) without showing anything.
+   Safari won't load or paint a video that isn't in the page, so it sits in the page, invisible */
 function engAutoFrame(src){
   return new Promise(res => {
     const vid = document.createElement('video');
-    vid.muted = true; vid.playsInline = true; vid.preload = 'auto'; vid.crossOrigin = 'anonymous';
-    const done = f => { clearTimeout(timer); vid.removeAttribute('src'); vid.load(); res(f); };
-    const timer = setTimeout(() => done(null), 10000);
-    vid.onloadedmetadata = () => { vid.currentTime = Math.min(1, (vid.duration || 2) * .1); };
-    vid.onseeked = () => engGrab(vid).then(src => done({src, x:50, y:50, z:1}), () => done(null));
-    vid.onerror = () => done(null);
-    vid.src = src;
+    vid.muted = vid.defaultMuted = true; vid.playsInline = true; vid.setAttribute('playsinline', ''); vid.preload = 'auto';
+    if(/^https?:/.test(src)) vid.crossOrigin = 'anonymous';   // needed to read pixels from Supabase / other sites
+    vid.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none';
+    document.body.append(vid);
+    let finished = false;
+    const done = f => { if(finished) return; finished = true; clearTimeout(timer); clearTimeout(kick); vid.pause(); vid.removeAttribute('src'); vid.load(); vid.remove(); res(f); };
+    const timer = setTimeout(() => done(null), 20000);
+    // wait until the seeked picture is really painted (Safari can hand back a blank one straight after "seeked")
+    const painted = () => new Promise(r => { const t = setTimeout(r, 300); if(vid.requestVideoFrameCallback) vid.requestVideoFrameCallback(() => { clearTimeout(t); r(); }); });
+    vid.addEventListener('loadeddata', () => { vid.currentTime = Math.min(1, (isFinite(vid.duration) && vid.duration > 0 ? vid.duration : 2) * .1); }, {once:true});
+    vid.addEventListener('seeked', () => painted().then(() => engGrab(vid)).then(s => done({src:s, x:50, y:50, z:1}), () => done(null)), {once:true});
+    vid.addEventListener('error', () => done(null), {once:true});
+    vid.src = src; vid.load();
+    // some browsers only start loading once the video plays: nudge it (muted, so it's allowed)
+    const kick = setTimeout(() => { if(vid.readyState < 2) vid.play().then(() => vid.pause()).catch(() => {}); }, 1500);
   });
+}
+/* lessons with an uploaded clip (or .mp4 link) but no cover yet: take a picture once, keep it, and show it */
+const engFillTried = new Set();
+async function engFillCovers(list, root){
+  for(const l of list){
+    if(l.cover || (l.frame && l.frame.src) || engFillTried.has(l.id)) continue;
+    const s = engSource(l.video);
+    if(!l.videoPath && !(s && s.kind === 'file')) continue;
+    engFillTried.add(l.id);
+    const url = l.videoPath ? await Store.videoUrl(l.videoPath) : s.src;
+    const f = url && await engAutoFrame(url);
+    if(!f) continue;
+    l.frame = f;
+    try{ await Store.save('english', l); }catch(e){ console.error(e); }
+    $$(`.eng-card[data-id="${l.id}"] .eng-thumb .noimg`, root).forEach(n => { n.outerHTML = engFrameImg(f); });
+  }
 }
 
 /* player markup; start = seconds to jump to */
@@ -126,7 +151,7 @@ async function engPickFrame(v, onDone, start){
       body.append(grid);
     } else {
       body.append(h('<p class="muted">เลื่อนคลิปไปยังภาพที่ชอบ แล้วกด "ใช้ภาพนี้"</p>'));
-      const vid = h('<video class="eng-pick-video" controls playsinline muted preload="auto" crossorigin="anonymous"></video>');
+      const vid = h(`<video class="eng-pick-video" controls playsinline muted preload="auto" ${/^https?:/.test(src.src) ? 'crossorigin="anonymous"' : ''}></video>`);
       vid.src = src.src;
       const bar = h('<div class="eng-pick-acts"></div>');
       bar.append(btn('ใช้ภาพนี้', '', async () => {
@@ -264,7 +289,7 @@ const English = {
 let engFilter = 'all';
 function engCard(l){
   const thumb = engCoverHTML(l), c = ENG_SKILL_COLOR[l.skill] || ENG_SKILL_COLOR.listening;
-  const a = h(`<a class="eng-card" href="#english/${encodeURIComponent(l.id)}" style="--sc:${c}">
+  const a = h(`<a class="eng-card" href="#english/${encodeURIComponent(l.id)}" data-id="${escT(l.id)}" style="--sc:${c}">
     <span class="eng-thumb">${thumb || `<span class="noimg">${ic(engHasVideo(l) ? 'video' : 'english')}</span>`}
       ${engHasVideo(l) ? `<span class="eng-play">${ic('play')}</span>` : ''}
       ${l.level ? `<span class="eng-lv">${escT(l.level)}</span>` : ''}
@@ -301,6 +326,7 @@ VIEWS.english = async el => {
   const grid = h('<div class="eng-grid"></div>');
   list.forEach(l => grid.append(engCard(l)));
   el.append(grid);
+  setTimeout(() => engFillCovers(list, document), 300);   // after the page is on screen
 };
 
 /* ---------- watch page ---------- */
@@ -350,9 +376,7 @@ async function engWatch(el, l, all){
   }
   el.append(page);
   // lessons saved before covers came from the clip: take a picture once and keep it
-  if(l.videoPath && fileUrl && !l.cover && !(l.frame && l.frame.src)){
-    engAutoFrame(fileUrl).then(f => { if(f){ l.frame = f; Store.save('english', l).catch(() => {}); } });
-  }
+  engFillCovers([l, ...next], document);
 }
 
 /* full-size photo viewer with previous / next */
