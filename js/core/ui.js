@@ -163,6 +163,8 @@ function fieldEl(f, v){
       }
     };
     paint(); wrap.append(row);
+  } else if(f.type === 'custom'){
+    wrap.append(f.render(v));
   } else if(f.type === 'row'){
     const row = h('<div class="two"></div>'); f.fields.forEach(sf => row.append(fieldEl(sf, v))); return row;
   }
